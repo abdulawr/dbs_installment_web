@@ -843,14 +843,8 @@
           </li>
 
          <?php } ?>
-
-
         </ul>
       </nav>
-
-
-
-
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->

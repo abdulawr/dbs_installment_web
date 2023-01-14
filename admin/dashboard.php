@@ -88,10 +88,17 @@ $company = DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
 
        <div class="container">
         <div class="row">
+          <div class="col-12">
+              <h4>
+                    <h3 class="bg-success text-center py-1 mb-3 rounded"><?php echo $company["name"];?></h3>
+              </h4>
+          </div>
+        </div>
+        <div class="row">
 
         <div class="col-4" style="border-right: 1px dotted grey;">
-          <img width="120" height="120" class="img-thumbnail" src="../images/logo.png" alt="">
-          <h5><?php echo $company["name"];?></h5>
+          <!-- <img width="120" height="120" class="img-thumbnail" src="../images/logo.png" alt=""> -->
+          <h5 class='bg-info py-1 text-center rounded'>Company Profile</h5>
           <p style="margin-bottom: 0px;"><b>Mobile: </b> <?php echo $company["mobile"];?></p>
           <p style="margin-bottom: 0px;"><b>Email: </b> <?php echo $company["email"];?></p>
           <p style="margin-bottom: 0px;"><b>Facebook: </b> <?php echo $company["facebook"];?></p>
@@ -105,7 +112,7 @@ $company = DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
         $pending_account = DBHelper::get("SELECT SUM(amount) as 'sum' from admin_account")->fetch_assoc();
         ?>
         <div class="col-4" style="border-right: 1px dotted grey;">
-         <h4 >DBS Company Account</h4>
+         <h5 class='bg-danger py-1 text-center rounded'>Company Account</h5>
          <h5><b>Balance: </b> <?php echo $account["amount"];?></h5>
          <h5><b>Pending Balance: </b> <?php echo $pending_account["sum"];?></h5>
         
@@ -155,7 +162,7 @@ $company = DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
         $stock = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 1")->fetch_assoc();
         ?>
         <div class="col-4">
-        <h4 >DBS Shop Account</h4>
+        <h5 class='bg-warning py-1 text-center rounded'>Shop Account</h5>
         <h5><b>Balance: </b> <?php echo $account["balance"];?></h5>
         <h5><b>Stock: </b> <?php echo $stock["balance"];?></h5>
         </div>
@@ -166,89 +173,93 @@ $company = DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
       </div>
     </div>
 
+
     <!-- Main content -->
     <section class="content">
       <div class="container-fluid">
-        <!-- Small boxes (Stat box) -->
-        <div class="row">
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3><?php echo $app["pending"];?></h3>
 
-                <p>Pending Application</p>
+      <div class="row">
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+              <a href="Application?type=pending">
+              <span class="info-box-icon bg-info elevation-1 h-100">
+                <i class="fas fa-file"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Pending Application</span>
+                <span class="info-box-number">
+                  <?php echo $app["pending"];?>
+                </span>
               </div>
-              <div class="icon">
-                <i class="ion ion-bag"></i>
-              </div>
-              <a href="Application?type=pending" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-          <!-- ./col -->
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <h3><?php echo $app["active"];?></h3>
-
-                <p>Active Application</p>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <a href="Application?type=active">
+              <span class="info-box-icon bg-success elevation-1 h-100"><i class="fas fa-cube"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Active Application</span>
+                <span class="info-box-number"><?php echo $app["active"];?></span>
               </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-              <a href="Application?type=active" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-          <!-- ./col -->
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-warning">
-              <div class="inner">
-                <h3><?php echo $app["complete"];?></h3>
+          <!-- /.col -->
 
-                <p>Complete Application</p>
+          <!-- fix for small devices only -->
+          <div class="clearfix hidden-md-up"></div>
+
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <a href="Application?type=completed">
+              <span class="info-box-icon bg-warning elevation-1 h-100"><i class="fas fa-cog"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Complete Application</span>
+                <span class="info-box-number"><?php echo $app["complete"];?></span>
               </div>
-              <div class="icon">
-                <i class="ion ion-person-add"></i>
-              </div>
-              <a href="Application?type=completed" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-          <!-- ./col -->
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-dark">
-              <div class="inner">
-                <h3><?php echo $app["accepted"];?></h3>
-
-                <p>Accepted Application</p>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+            <a  href="Application?type=accepted">
+              <span class="info-box-icon bg-secondary elevation-1 h-100"><i class="fas fa-thumbs-up"></i></span>
+            </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Accepted Application</span>
+                <span class="info-box-number"><?php echo $app["accepted"];?></span>
               </div>
-              <div class="icon">
-                <i class="ion ion-pie-graph"></i>
-              </div>
-              <a href="Application?type=accepted" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
+          <!-- /.col -->
 
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-primary">
-              <div class="inner">
-                <h3><?php echo $app["app"];?></h3>
-
-                <p>Total Application</p>
+           <!-- /.col -->
+           <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <a  href="Application">
+              <span class="info-box-icon bg-primary elevation-1 h-100"><i class="fas fa-bars"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Total Application</span>
+                <span class="info-box-number"><?php echo $app["app"];?></span>
               </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-              <a href="Application" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-          <!-- ./col -->
+          <!-- /.col -->
+
         </div>
-        <!-- /.row -->
-        <!-- Main row -->
     
         <!-- /.row (main row) -->
       </div><!-- /.container-fluid -->
@@ -257,83 +268,82 @@ $company = DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
 
 <hr>
 
-    <section class="content">
+
+  <!-- Main content -->
+  <section class="content">
       <div class="container-fluid">
-        <!-- Small boxes (Stat box) -->
-        <div class="row">
-         
-          <!-- ./col -->
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <h3><?php echo $data["customer"];?></h3>
 
-                <p>Total Customer</p>
+      <div class="row">
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+              <a href="Customer_List">
+              <span class="info-box-icon bg-info elevation-1 h-100">
+                <i class="fas fa-users"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Total Customer</span>
+                <span class="info-box-number">
+                <?php echo $data["customer"];?>
+                </span>
               </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-              <a href="Customer_List" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <h3><?php echo $data["investor"];?></h3>
-
-                <p>Total Investor</p>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <a href="InvestorList">
+              <span class="info-box-icon bg-success elevation-1 h-100"><i class="fas fa-users"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Total Investor</span>
+                <span class="info-box-number"><?php echo $data["investor"];?></span>
               </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-              <a href="InvestorList" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
+          <!-- /.col -->
 
+          <!-- fix for small devices only -->
+          <div class="clearfix hidden-md-up"></div>
 
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <h3><?php echo $data["super"];?></h3>
-
-                <p>Super Admin</p>
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <a href="AdminList">
+              <span class="info-box-icon bg-warning elevation-1 h-100"><i class="fas fa-cogs"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Super Admin</span>
+                <span class="info-box-number"><?php echo $data["super"];?></span>
               </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-              <a href="AdminList" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-
-
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <h3><?php echo $data["sub"];?></h3>
-
-                <p>Sub Admin</p>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+            <a  href="AdminList">
+              <span class="info-box-icon bg-secondary elevation-1 h-100"><i class="fas fa-cogs"></i></span>
+            </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Sub Admin</span>
+                <span class="info-box-number"><?php echo $data["sub"];?></span>
               </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-              <a href="AdminList" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-         
+          <!-- /.col -->
+
         </div>
-        <!-- /.row -->
-        <!-- Main row -->
     
         <!-- /.row (main row) -->
       </div><!-- /.container-fluid -->
     </section>
-
+    <!-- /.content -->
 
 
 
@@ -341,7 +351,7 @@ $company = DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0 text-dark">DBS Shop Section</h1>
+            <h1 class="m-0 text-dark">Shop Section</h1>
           </div><!-- /.col -->
          
         </div><!-- /.row -->
@@ -363,77 +373,83 @@ $company = DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
   ) AS stock")->fetch_assoc();
     ?>
 
-    <section class="content">
+
+
+ <!-- Main content -->
+ <section class="content">
       <div class="container-fluid">
-        <!-- Small boxes (Stat box) -->
-        <div class="row">
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-info">
-              <div class="inner">
-                <h3><?php echo $dbs["customer"];?></h3>
 
-                <p>DBS Shop Customer</p>
+      <div class="row">
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box">
+              <a href="ShopkeeperList">
+              <span class="info-box-icon bg-info elevation-1 h-100">
+                <i class="fas fa-users"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Shop Customer</span>
+                <span class="info-box-number">
+                <?php echo $dbs["customer"];?>
+                </span>
               </div>
-              <div class="icon">
-                <i class="ion ion-bag"></i>
-              </div>
-              <a href="ShopkeeperList" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-          <!-- ./col -->
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-success">
-              <div class="inner">
-                <h3><?php echo $dbs["pending"];?></h3>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <a href="PendingRequest">
+              <span class="info-box-icon bg-success elevation-1 h-100"><i class="fas fa-users"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Pending Request</span>
+                <span class="info-box-number"><?php echo $dbs["pending"];?></span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
 
-                <p>Pending Request</p>
-              </div>
-              <div class="icon">
-                <i class="ion ion-stats-bars"></i>
-              </div>
-              <a href="PendingRequest" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-          </div>
-          <!-- ./col -->
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-warning">
-              <div class="inner">
-                <h3><?php echo $dbs["history"];?></h3>
+          <!-- fix for small devices only -->
+          <div class="clearfix hidden-md-up"></div>
 
-                <p>Purchase History</p>
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+              <a href="PurchaseHistory">
+              <span class="info-box-icon bg-warning elevation-1 h-100"><i class="fas fa-cogs"></i></span>
+              </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Purchase History</span>
+                <span class="info-box-number"><?php echo $dbs["history"];?></span>
               </div>
-              <div class="icon">
-                <i class="ion ion-person-add"></i>
-              </div>
-              <a href="PurchaseHistory" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              <!-- /.info-box-content -->
             </div>
+            <!-- /.info-box -->
           </div>
-          <!-- ./col -->
-          <div class="col-lg-3 col-6">
-            <!-- small box -->
-            <div class="small-box bg-primary">
-              <div class="inner">
-                <h3><?php echo $dbs["stock"];?></h3>
+          <!-- /.col -->
+          <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box mb-3">
+            <a  href="StockList">
+              <span class="info-box-icon bg-secondary elevation-1 h-100"><i class="fas fa-cogs"></i></span>
+            </a>
+              <div class="info-box-content">
+                <span class="info-box-text">Total Stock</span>
+                <span class="info-box-number"><?php echo $dbs["stock"];?></span>
+              </div>
+              <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+          </div>
+          <!-- /.col -->
 
-                <p>Total Stock</p>
-              </div>
-              <div class="icon">
-                <i class="ion ion-pie-graph"></i>
-              </div>
-              <a href="StockList" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-            </div>
-          </div>
-          <!-- ./col -->
         </div>
-        <!-- /.row -->
-        <!-- Main row -->
     
         <!-- /.row (main row) -->
       </div><!-- /.container-fluid -->
     </section>
+    <!-- /.content -->
 
 
   </div>

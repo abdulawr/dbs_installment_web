@@ -84,7 +84,7 @@ if(isset($_GET["id"])){
                         <td><?php echo ucfirst($row["name"]);?></td>
                         <td class="w-25">
                             <a class="btn-sm btn-warning" href="add_company?id=<?php echo $row["id"];?>">Update</a>
-                            <a class="btn-sm btn-danger" href="model/delete_companies.php?id=<?php echo $row["id"];?>">Delete</a>
+                            <!--<a  class="btn-sm btn-danger" href="model/delete_companies.php?id=<?php echo $row["id"];?>">Delete</a>-->
                         </td>
                     </tr>
                     <?php

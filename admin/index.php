@@ -15,6 +15,7 @@ include("../include/HelperFunction.php");
 include("include/response.php");
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,19 +24,19 @@ include("include/response.php");
   <title>DBS INSTALMENT</title>
   <script src="plugins/jquery/jquery.min.js"></script>
   <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
-  <!-- Google Font: Source Sans Pro -->
+   <!--Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome -->
+   <!--Font Awesome -->
   <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-  <!-- icheck bootstrap -->
+   <!--icheck bootstrap -->
   <link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-  <!-- Theme style -->
+   <!--Theme style -->
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
 
-  <!-- /.login-logo -->
+   <!--/.login-logo -->
   <div class="card">
     <div class="card-body login-card-body">
       <div style="text-align: center;">
@@ -82,29 +83,29 @@ include("include/response.php");
           <div class="col-8">
             
           </div>
-          <!-- /.col -->
+           <!--/.col -->
           <div class="col-4">
             <button name="submit" type="submit" class="btn btn-primary btn-block">Sign In</button>
           </div>
-          <!-- /.col -->
+           <!--/.col -->
         </div>
       </form>
 
-     <!--  <p class="mb-1">
-        <a href="forgot-password.html">I forgot my password</a>
-      </p> -->
+      <!-- <p class="mb-1">-->
+      <!--  <a href="forgot-password.html">I forgot my password</a>-->
+      <!--</p> -->
     
     </div>
-    <!-- /.login-card-body -->
+     <!--/.login-card-body -->
   </div>
 </div>
-<!-- /.login-box -->
+ <!--/.login-box -->
 
-<!-- jQuery -->
+ <!--jQuery -->
 <script src="plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
+ <!--Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
+ <!--AdminLTE App -->
 <script src="dist/js/adminlte.min.js"></script>
 </body>
 </html>
@@ -130,6 +131,8 @@ if(isset($_POST["submit"])){
       <?php
     }else{
        showMessage("Invalid username or password",false);
+         session_destroy();
+                session_unset();
     }
 
   }
@@ -148,6 +151,8 @@ if(isset($_POST["submit"])){
       <?php
     }else{
        showMessage("Invalid username or password",false);
+         session_destroy();
+         session_unset();
     }
 
   }

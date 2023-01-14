@@ -39,15 +39,16 @@ else{
     }
    }
    else{
-     $qry_status = "application.status in (1,2,3,4,0)";
+     $qry_status = "application.status in (1,2,3,4,0,5)";
      $title = "Applications";
    }
 }
 
 $customer=DBHelper::get("SELECT customer.id AS 'cusID',customer.name,customer.mobile,companies.name 
 as 'comp',item_type.name as 'item',application.* from application INNER JOIN 
-customer on customer.id = cusID INNER JOIN companies on companies.id = companyID 
-INNER JOIN item_type on item_type.id = item_type_id where {$qry_status};");
+customer on customer.id = cusID left JOIN companies on companies.id = companyID 
+left JOIN item_type on item_type.id = item_type_id where {$qry_status};");
+
 ?>
 
 <body class="hold-transition sidebar-mini">
