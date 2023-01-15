@@ -7,6 +7,10 @@
      
     </ul>
 
+    <h5 style="margin:0px; font-weight:bold"><?php echo $_SESSION['company']['name'];?>
+      <span class='text-danger' style="font-weight:normal">   (<?php echo $_SESSION['user']['name'];?>)</span>
+    </h5>
+
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
 

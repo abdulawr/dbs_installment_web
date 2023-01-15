@@ -1,6 +1,6 @@
 <?php include("include/header.php") ;
-$ID = $_GET["ID"];
-$customer=DBHelper::get("select * from customer where id = {$ID}")->fetch_assoc();
+$ID = DBHelper::escape($_GET["ID"]);
+$customer=DBHelper::get("select * from customer where id = {$ID} and company_id = '{$_SESSION["company_id"]}' ")->fetch_assoc();
 ?>
 
 <body class="hold-transition sidebar-mini">

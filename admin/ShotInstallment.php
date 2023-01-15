@@ -17,7 +17,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center" >
             <h1>Pending Installments</h1>
           </div>
         </div>
@@ -57,7 +57,7 @@
                       }
 
 
-                  $active_app = DBHelper::get("select * from application where status = 3");
+                  $active_app = DBHelper::get("select * from application where status = 3 and company_id = '{$_SESSION["company_id"]}'");
                   while($row = $active_app->fetch_assoc()){
                    
                     $activeDate = $row["active_date"];

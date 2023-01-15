@@ -33,9 +33,9 @@
    if(isset($_POST["submit"])){
        $invesID = $_POST["investID"];
        $appID = $_POST["appID"];
-       $app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$appID}")->fetch_assoc();
-       $customer = DBHelper::get("SELECT * FROM `customer` WHERE id = {$app["cusID"]}")->fetch_assoc();
-       $investor = DBHelper::get("SELECT * FROM `investor` WHERE id = {$invesID}")->fetch_assoc();
+       $app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$appID} and application.company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
+       $customer = DBHelper::get("SELECT * FROM `customer` WHERE id = {$app["cusID"]} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
+       $investor = DBHelper::get("SELECT * FROM `investor` WHERE id = {$invesID} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
   
        $profit = ($app["product_orginal_price"] / 100) * $app["percentage_on_prod"];
        $profit = ceil($profit);
@@ -46,14 +46,14 @@
        $investor_total = $app["product_orginal_price"] + $investor_prof;
     
        $pending_payment_query = "INSERT INTO `application_investor_pending_payment`
-       (`invest_amount`, `appID`, `investorID`, `cusID`, `date`,`profit`, `total_amount`,payable)
+       (`invest_amount`, `appID`, `investorID`, `cusID`, `date`,`profit`, `total_amount`,payable,company_id)
        VALUES ({$app["product_orginal_price"]},
               {$appID},
               {$invesID},
               {$app["cusID"]},
               '{$date}',
               {$investor_prof},
-              {$investor_total}, {$investor_total});";
+              {$investor_total}, {$investor_total},'{$_SESSION["company_id"]}');";
 $state = false;
 if(DBHelper::set($pending_payment_query)){
   $insert_id = $con->insert_id;
@@ -61,11 +61,11 @@ if(DBHelper::set($pending_payment_query)){
   $typ = strtolower(explode("/",$file["type"])[1]);
   $fileName = "app_".$appID."_".RandomString(30).".".$typ;
   move_uploaded_file($file["tmp_name"],"../images/application/".$fileName);
-  if(DBHelper::set("UPDATE application set status = 3,investorID=$invesID, delivery_image='{$fileName}' WHERE id = {$appID}")){
+  if(DBHelper::set("UPDATE application set status = 3,investorID=$invesID, delivery_image='{$fileName}' WHERE id = {$appID} and company_id = '{$_SESSION["company_id"]}'")){
     if(DBHelper::set("INSERT INTO `application_installment`(`appID`, `date`, `amount`, `type`) VALUES ({$appID},'{$date}',{$app["advance_payment"]},'A')")){
     $installment_id = $con->insert_id;
     
-    if(DBHelper::set("UPDATE investor_account SET balance = balance - {$app["product_orginal_price"]} where investorID = {$invesID}")){
+    if(DBHelper::set("UPDATE investor_account SET balance = balance - {$app["product_orginal_price"]} where investorID = {$invesID} and company_id = '{$_SESSION["company_id"]}'")){
       $adminID = $_SESSION["isAdmin"];
       $adminType = $_SESSION["type"];
       $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID}");
@@ -77,7 +77,7 @@ if(DBHelper::set($pending_payment_query)){
         DBHelper::set("UPDATE admin_account set amount = amount + {$app["advance_payment"]} WHERE adminID = {$adminID}");
       }
       else{
-        DBHelper::set("UPDATE company_account set amount=amount+ {$app["advance_payment"]}");
+        DBHelper::set("UPDATE company_account set amount=amount+ {$app["advance_payment"]} where id = '{$_SESSION['company_id']}' ");
       }
 
       DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID) VALUES ({$app["advance_payment"]},'{$date}',2,'customer',$adminID,$appID)");
@@ -173,8 +173,8 @@ if(DBHelper::set($pending_payment_query)){
       <div class="card">
         <div class="card-body">
          <div>
-             <img  class="rounded img-thumbnail" width="80" height="80" src="../images/logo.png" alt="">
-             <h1 style="display:inline-block; margin-left:20px; color:brown; font-size:30px">DBS Installment</h1>
+             <img  class="rounded img-thumbnail" width="80" height="80" src="c_images/<?php echo $_SESSION['company']['logo'];?>" alt="">
+             <h1 style="display:inline-block; margin-left:20px; color:brown; font-size:30px"><?php echo $_SESSION['company']['name'];?></h1>
          
              <?php
             $barcodeText = DBHelper::intCodeRandom(15);

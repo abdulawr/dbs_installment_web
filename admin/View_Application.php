@@ -1,5 +1,5 @@
 <?php include("include/header.php") ;
-$comp=DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
+$comp= $_SESSION["company"];
 $id = DBHelper::escape($_GET["ID"]);
 $app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$id}")->fetch_assoc();
 $customer = DBHelper::get("SELECT * from customer WHERE id = {$app["cusID"]}")->fetch_assoc();
@@ -111,8 +111,8 @@ h3{
 
         <div class="sign container">
           <div class="row">
-            <div class="col"> <img  class="rounded img-thumbnail" width="80" height="80" src="../images/logo.png" alt="">
-             <h1 style="display:inline-block; margin-left:20px; color:brown; font-size:30px">DBS Installment</h1>
+            <div class="col"> <img  class="rounded img-thumbnail" width="80" height="80" src="c_images/<?php echo $_SESSION['company']['logo'];?>" alt="">
+             <h1 style="display:inline-block; margin-left:20px; color:brown; font-size:30px"><?php echo $_SESSION["company"]['name'];?></h1>
 
             </div>
            

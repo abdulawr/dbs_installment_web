@@ -17,7 +17,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center">
             <h1>Add New Customer</h1>
           </div>
         </div>
@@ -107,7 +107,7 @@ if ($select->num_rows <= 0) {
     if (in_array($type, $arrType)) {
         $imageName="customer_".$cnic.RandomString(15).".".$type;
         if (move_uploaded_file($_FILES['file']['tmp_name'], "../images/customer/".$imageName)) {
-            if(DBHelper::set("INSERT INTO `customer`(fname,`name`, `cnic`, `mobile`, `address`, `image`) VALUES ('{$fname}','{$name}','{$cnic}','{$mobile}','{$address}','{$imageName}')")){
+            if(DBHelper::set("INSERT INTO `customer`(fname,`name`, `cnic`, `mobile`, `address`, `image`,company_id) VALUES ('{$fname}','{$name}','{$cnic}','{$mobile}','{$address}','{$imageName}','{$_SESSION["company_id"]}')")){
                 showMessage("Customer Added Successfully!",true);    
              }   
              else{

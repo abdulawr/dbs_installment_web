@@ -1,7 +1,7 @@
 <?php include("include/header.php") ;
 $id = $_GET["ID"];
-$app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$id}")->fetch_assoc();
-$investorList = DBHelper::get("SELECT investor.*,investor_account.balance FROM investor INNER JOIN investor_account on investorID = investor.id WHERE balance >= {$app["product_orginal_price"]};");
+$app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$id} and application.company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
+$investorList = DBHelper::get("SELECT investor.*,investor_account.balance FROM investor INNER JOIN investor_account on investorID = investor.id WHERE balance >= {$app["product_orginal_price"]} and investor.company_id = '{$_SESSION["company_id"]}';");
 ?>
 
 <body class="hold-transition sidebar-mini">

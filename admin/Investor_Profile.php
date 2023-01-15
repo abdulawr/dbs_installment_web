@@ -1,6 +1,6 @@
 <?php include("include/header.php");
 $id = $_GET["ID"];
-$investor = DBHelper::get("select * from investor where id = {$id}")->fetch_assoc();
+$investor = DBHelper::get("select * from investor where id = {$id} and company_id = '{$_SESSION["company_id"]}' ")->fetch_assoc();
 $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorID = {$investor["id"]}")->fetch_assoc()["balance"];
 ?>
 

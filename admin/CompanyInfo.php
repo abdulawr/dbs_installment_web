@@ -1,5 +1,5 @@
 <?php include("include/header.php");
-$company=DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
+$company = DBHelper::get("SELECT * FROM `company_info` where id = '{$_SESSION["company_id"]}' ")->fetch_assoc();
 ;?>
 
 <body class="hold-transition sidebar-mini">
@@ -19,7 +19,7 @@ $company=DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 titleBackground rounded pt-1 pb-1 text-center" >
             <h1>Update Company Info</h1>
           </div>
         </div>
@@ -33,7 +33,12 @@ $company=DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
       <div class="card">
         <div class="card-body">
 
-        <form method="post">
+        <div class="d-flex mb-3 align-items-center">
+           <img class="img-thumbnail" style="width:60px; height:60px;" src="c_images/<?php echo $_SESSION['company']['logo']; ?>" alt="">
+           <h3 class="pl-3"><?php echo $_SESSION['company']['name'];?></h3>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
             <div class="form-row">
                 <div class="form-group col-md-4">
                 <label for="inputEmail4">Name</label>
@@ -64,6 +69,10 @@ $company=DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
                 <input required name="whatsapp" type="number" class="form-control" id="inputCity" value="<?php echo $company["whatsapp"];?>">
                 </div>
 
+            </div>
+
+            <div class="form-row mb-3 ml-1">
+                 <input name="file" require type="file">
             </div>
             
             <button name="submit" type="submit" class="btn btn-info">Update</button>
@@ -102,7 +111,43 @@ if(isset($_POST["submit"])){
    $facebook=validateInput($_POST["facebook"]);
    $whatsapp=validateInput($_POST["whatsapp"]);
 
-   if(DBHelper::set("UPDATE `company_info` SET `name`='{$name}',`mobile`='{$mobile}',`email`='{$email}',`address`='{$address}',`facebook`='{$facebook}',`whatsapp`='{$whatsapp}'")){
+   if(!empty($_FILES["file"]['name'])){
+    if(file_exists('c_images/'.$_SESSION["company"]["logo"])){
+       unlink('c_images/'.$_SESSION["company"]["logo"]);
+    }
+
+    $type=$_FILES["file"]["type"];
+    $type=explode("/",$type)[1];
+    $arrType=["png","jpg","jpeg","gif"];
+
+    if(in_array($type,$arrType)){
+      $imageName="comp_".time()."_".RandomString(15).".".$type;
+
+      if(move_uploaded_file($_FILES['file']['tmp_name'],"c_images/".$imageName)){
+        $q = "UPDATE `company_info` SET `name`='{$name}',`mobile`='{$mobile}',
+        `email`='{$email}',`address`='{$address}',`facebook`='{$facebook}',`whatsapp`='{$whatsapp}',logo='$imageName' where id = '{$_SESSION["company_id"]}'";
+      }
+      else{
+        showMessage("Image can`t be upload right now try later",false);   
+      }
+
+    }
+    else{
+      showMessage("Invalid image type is provided only (png, gif, jpg, jpeg) are supported",false);
+   }
+    
+   }
+   else{
+    $q = "UPDATE `company_info` SET `name`='{$name}',`mobile`='{$mobile}',
+   `email`='{$email}',`address`='{$address}',`facebook`='{$facebook}',`whatsapp`='{$whatsapp}' where id = '{$_SESSION["company_id"]}'";
+   }
+
+
+   if(DBHelper::set($q)){
+
+    $company = DBHelper::get("SELECT * FROM `company_info` where id = '{$_SESSION['company_id']}'")->fetch_assoc();
+    $_SESSION['company'] = $company;
+
     showMessage("Successfully updated!",true);
    }
    else{

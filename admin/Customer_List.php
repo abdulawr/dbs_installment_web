@@ -24,12 +24,12 @@ elseif($type == "4"){
 else{
     $qry="SELECT * FROM `customer`";
 }
-
+$qry .= " and company_id = '{$_SESSION["company_id"]}'";
 $customer=DBHelper::get($qry);
 }
 
 else{
-$customer=DBHelper::get("SELECT * FROM `customer`");
+$customer=DBHelper::get("SELECT * FROM `customer` where company_id = '{$_SESSION["company_id"]}' ");
 }
 ?>
 
@@ -50,7 +50,7 @@ $customer=DBHelper::get("SELECT * FROM `customer`");
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 titleBackground rounded pt-1 pb-1 text-center" >
             <h1>Customer List</h1>
           </div>
         </div>
@@ -101,7 +101,7 @@ $customer=DBHelper::get("SELECT * FROM `customer`");
                  
                 <?php
                 if($customer != "null"){
-                    if($customer->num_rows > 0){
+                    if(@$customer->num_rows > 0){
                         while($row=$customer->fetch_assoc()){
                         ?>
                      <tr>

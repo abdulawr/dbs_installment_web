@@ -18,17 +18,17 @@ if($check_admin_account->num_rows <= 0){
  DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`) VALUES (0,{$adminID})");
 }
 
-if(DBHelper::set("INSERT INTO `company_expense`(`amount`, `date`, `comment`, `adminID`,status) VALUES ($amount,'{$date}','{$comment}',$adminID,$exp_type)")){
+if(DBHelper::set("INSERT INTO `company_expense`(`amount`, `date`, `comment`, `adminID`,status,company_id) VALUES ($amount,'{$date}','{$comment}',$adminID,$exp_type,'{$_SESSION["company_id"]}')")){
    
     if($adminType == 2){
         DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID}");
       } 
       else{
         if($exp_type == 1){
-            DBHelper::set("UPDATE dbs_shop_account set balance = balance - {$amount} WHERE status = 0");
+            DBHelper::set("UPDATE dbs_shop_account set balance = balance - {$amount} WHERE status = 0 and company_id = '{$_SESSION["company_id"]}'");
         }
         else{
-            DBHelper::set("UPDATE company_account set amount=amount - {$amount}");
+            DBHelper::set("UPDATE company_account set amount=amount - {$amount} where id = '{$_SESSION["company_id"]}'");
         }
       }
 

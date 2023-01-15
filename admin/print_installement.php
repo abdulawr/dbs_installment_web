@@ -1,7 +1,7 @@
 <?php include("include/header.php");
 $ID = DBHelper::escape($_GET["ID"]);
-$app = DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
-$customer = DBHelper::get("select * from customer where id = {$app["cusID"]}")->fetch_assoc();
+$app = DBHelper::get("select * from application where id = {$ID} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
+$customer = DBHelper::get("select * from customer where id = {$app["cusID"]} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
 
 ?>
 
@@ -61,8 +61,8 @@ $customer = DBHelper::get("select * from customer where id = {$app["cusID"]}")->
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
-            <h1>Installment History</h1>
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center" >
+            <h1><?php echo $_SESSION['company']["name"];?></h1>
           </div>
         </div>
       </div><!-- /.container-fluid -->
@@ -77,8 +77,8 @@ $customer = DBHelper::get("select * from customer where id = {$app["cusID"]}")->
 
 
         <div>
-             <img  class="rounded img-thumbnail" width="80" height="80" src="../images/logo.png" alt="">
-             <h1 style="display:inline-block; margin-left:20px; color:brown; font-size:30px">DBS Installment</h1>
+             <img  class="rounded img-thumbnail" width="80" height="80" src="c_images/<?php echo $_SESSION['company']["logo"];?>" alt="">
+             <h1 style="display:inline-block; margin-left:20px; color:brown; font-size:30px"><?php echo $_SESSION['company']["name"];?></h1>
              <?php
             $barcodeText = DBHelper::intCodeRandom(15);
             $barcodeType= 'codabar';
@@ -92,28 +92,42 @@ $customer = DBHelper::get("select * from customer where id = {$app["cusID"]}")->
             </div>
          <hr>
 
+         <div class="container">
+           <div class="row">
 
-         <h4 class="mt-3">Customer Information</h4>
-         <div class="container mt-3">
-             <div class="row">
-                 <p class="col"><b>ID: </b><span style="margin-left: 10px;"><?php echo $customer["id"];?></span></p>
-                 <p class="col"><b>Name: </b><span style="margin-left: 10px;"><?php echo $customer["name"];?></span></p>
-                 <p class="col"><b>F-Name: </b><span style="margin-left: 10px;"><?php echo $customer["fname"];?></span></p>
-                 <p class="col"><b>Mobile: </b><span style="margin-left: 10px;"><?php echo $customer["mobile"];?></span></p>
-             </div>
+              <div class="col">
+                 <h4 class="mt-3">Customer Information</h4>
+                  <div class="container mt-3">
+                      <div class="row">
+                          <p class="col-12 mb-1"><b>ID: </b><span style="margin-left: 10px;"><?php echo $customer["id"];?></span></p>
+                          <p class="col-12 mb-1"><b>Name: </b><span style="margin-left: 10px;"><?php echo $customer["name"];?></span></p>
+                          <p class="col-12 mb-1"><b>F-Name: </b><span style="margin-left: 10px;"><?php echo $customer["fname"];?></span></p>
+                          <p class="col-12 mb-1"><b>Mobile: </b><span style="margin-left: 10px;"><?php echo $customer["mobile"];?></span></p>
+                      </div>
+                  </div>
+              </div>
+              
+              <div class="col">
+                <h4 class="mt-4">Application Information</h4>
+                  <div class="container mt-3">
+                      <div class="row">
+                          <p class="col-12 mb-1"><b>ID: </b><span style="margin-left: 10px;"><?php echo $app["id"];?></span></p>
+                          <p class="col-12 mb-1"><b>Total Price: </b><span style="margin-left: 10px;"><?php echo $app["total_price"];?></span></p>
+                          <p class="col-12 mb-1"><b>Installment Months: </b><span style="margin-left: 10px;"><?php echo $app["installment_months"];?></span></p>
+                          <p class="col-12 mb-1"><b>Monthly Payment: </b><span style="margin-left: 10px;"><?php echo $app["monthly_payment"];?></span></p>
+                          <p class="col-12 mb-1"><b>Advance Payment: </b><span style="margin-left: 10px;"><?php echo $app["advance_payment"];?></span></p>
+                      </div>
+                  </div>
+              </div>
+
+           </div>
          </div>
 
+        
 
-         <h4 class="mt-4">Application Information</h4>
-         <div class="container mt-3">
-             <div class="row">
-                 <p class="col"><b>ID: </b><span style="margin-left: 10px;"><?php echo $app["id"];?></span></p>
-                 <p class="col"><b>Total Price: </b><span style="margin-left: 10px;"><?php echo $app["total_price"];?></span></p>
-                 <p class="col"><b>Installment Months: </b><span style="margin-left: 10px;"><?php echo $app["installment_months"];?></span></p>
-                 <p class="col"><b>Monthly Payment: </b><span style="margin-left: 10px;"><?php echo $app["monthly_payment"];?></span></p>
-                 <p class="col"><b>Advance Payment: </b><span style="margin-left: 10px;"><?php echo $app["advance_payment"];?></span></p>
-             </div>
-         </div>
+
+     
+
 
          <?php
         $installment = DBHelper::get("SELECT  (

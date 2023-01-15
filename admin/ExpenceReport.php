@@ -6,24 +6,24 @@ $month=$_POST["month"];
 $year=$_POST["year"];
 
 if($month == 0 && $year == 0){
-    $qry = "SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id;";
+    $qry = "SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id";
 }
 elseif($month != 0 && $year == 0){
-    $qry = "SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id WHERE Month(company_expense.date) = {$month};";
+    $qry = "SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id WHERE Month(company_expense.date) = {$month}";
 }
 elseif($month == 0 && $year != 0){
-    $qry = "SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id WHERE Year(company_expense.date) = {$year};";
+    $qry = "SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id WHERE Year(company_expense.date) = {$year}";
 }
 elseif($month != 0 && $year != 0){
- $qry = "SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id WHERE Year(company_expense.date) = {$year} and Month(company_expense.date) = {$month};";
+ $qry = "SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id WHERE Year(company_expense.date) = {$year} and Month(company_expense.date) = {$month}";
 }
-
+$qry .= " and company_id = '{$_SESSION["company_id"]}' ";
 $customer=DBHelper::get($qry);
 }
 
 else{
 $day = date("d");
-$customer=DBHelper::get("SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id where day(company_expense.date) = '{$day}' order by company_expense.id desc;");
+$customer=DBHelper::get("SELECT company_expense.*,name,mobile from company_expense INNER JOIN admin on adminID = admin.id where day(company_expense.date) = '{$day}' and company_id = '{$_SESSION["company_id"]}' order by company_expense.id desc;");
 }
 ?>
 
@@ -44,7 +44,7 @@ $customer=DBHelper::get("SELECT company_expense.*,name,mobile from company_expen
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center">
             <h1>Company Expences</h1>
           </div>
         </div>

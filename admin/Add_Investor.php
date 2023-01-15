@@ -17,7 +17,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-success pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center">
             <h1>Add Investor</h1>
           </div>
         </div>
@@ -35,7 +35,7 @@
      <div class="form-row">
         <div class="form-group col-md-4">
         <label for="inputEmail4">Name</label>
-        <input name="name" required type="text" class="form-control urdu" id="inputEmail4" placeholder="نام">
+        <input name="name" required type="text" class="form-control" id="inputEmail4" placeholder="Name">
         </div>
         <div class="form-group col-md-4">
         <label for="inputPassword4">CNIC</label>
@@ -43,12 +43,12 @@
         </div>
         <div class="form-group col-md-4">
         <label for="inputPassword4">Mobile</label>
-        <input name="mobile" required type="number" maxlength="11" class="form-control" id="inputPassword4" placeholder="موبائل نمبر">
+        <input name="mobile" required type="number" maxlength="11" class="form-control" id="inputPassword4" placeholder="Mobile no">
         </div>
             </div>
         <div class="form-group">
             <label for="inputAddress">Address</label>
-            <input required name="address" type="text" class="form-control urdu" id="inputAddress" placeholder="پتہ">
+            <input required name="address" type="text" class="form-control" id="inputAddress" placeholder="Address">
         </div>
 
         <div class="form-group">
@@ -100,9 +100,9 @@ if (isset($_POST["addInverstor"])) {
   }
   else{
     if(move_uploaded_file($file["tmp_name"],"../images/investor/".$filename)){
-      if(DBHelper::set("INSERT INTO `investor`(`name`, `cnic`, `mobile`, `address`, `image`) VALUES ('{$name}','{$cnic}','{$mobile}','{$address}','{$filename}')")){ 
+      if(DBHelper::set("INSERT INTO `investor`(`name`, `cnic`, `mobile`, `address`, `image`,company_id) VALUES ('{$name}','{$cnic}','{$mobile}','{$address}','{$filename}','{$_SESSION["company_id"]}')")){ 
         $investor_id = $con->insert_id;
-        DBHelper::set("INSERT INTO investor_account (investorID) VALUES({$investor_id})");
+        DBHelper::set("INSERT INTO investor_account (investorID,company_id) VALUES({$investor_id},'{$_SESSION["company_id"]}')");
         showMessage("Investor is added successfully!",true);
       }
       else{

@@ -47,7 +47,7 @@ else{
 $customer=DBHelper::get("SELECT customer.id AS 'cusID',customer.name,customer.mobile,companies.name 
 as 'comp',item_type.name as 'item',application.* from application INNER JOIN 
 customer on customer.id = cusID left JOIN companies on companies.id = companyID 
-left JOIN item_type on item_type.id = item_type_id where {$qry_status};");
+left JOIN item_type on item_type.id = item_type_id where {$qry_status} and application.company_id = '{$_SESSION["company_id"]}' order by application.id desc;");
 
 ?>
 
@@ -68,7 +68,7 @@ left JOIN item_type on item_type.id = item_type_id where {$qry_status};");
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center" >
             <h1><?php echo $title;?></h1>
           </div>
         </div>
@@ -122,7 +122,7 @@ left JOIN item_type on item_type.id = item_type_id where {$qry_status};");
                         ?>
                      <tr>
                         <td><?php echo $row["id"];?></td>
-                        <td class="urdu"><?php echo $row["name"];?></td>
+                        <td><?php echo $row["name"];?></td>
                         <td><?php echo $row["mobile"];?></td>
                         <td><?php echo $row["product_name"];?></td>
                         <td><?php echo $row["model_no"];?></td>
@@ -229,7 +229,7 @@ left JOIN item_type on item_type.id = item_type_id where {$qry_status};");
       "paging": true,
       "lengthChange": false,
       "searching": false,
-      "ordering": true,
+      "ordering": false,
       "info": true,
       "autoWidth": false,
       "responsive": true,

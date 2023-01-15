@@ -1,8 +1,8 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="dashboard" class="brand-link">
-      <img src="../images/logo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">DBS INSTALMENT</span>
+      <img src="c_images/<?php echo $_SESSION['company']['logo'];?>" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <span class="brand-text font-weight-light">MIS SYSTEM</span>
     </a>
 
     <!-- Sidebar -->
@@ -27,6 +27,17 @@
             </a>
            
           </li>
+
+          <?php if ($_SESSION["type"] == "1") {?>
+          <li class="nav-item menu-open">
+            <a href="new_company" class="nav-link">
+              <i class="nav-icon fas fa-building"></i>
+              <p>
+                New Company
+              </p>
+            </a>
+          </li>
+          <?php } ?>
 
 
 
@@ -379,12 +390,14 @@
             </a>
             <ul class="nav nav-treeview">
 
+            <?php if ($_SESSION["type"] == "1") {?>
               <li class="nav-item">
                 <a href="CompanyInfo" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Company Info</p>
                 </a>
               </li>
+            <?php } ?>
 
               <li class="nav-item">
                 <a href="add_company" class="nav-link">
@@ -466,7 +479,7 @@
           </li>
 
 
-          <li class="nav-header">DBS Mobile Shop</li>
+          <li class="nav-header">Mobile Shop</li>
 
           <!--^^^^^^^^^^^^^^^^^^^^^ DBS Shop user section ^^^^^^^^^^^^^^^^^^^^^  -->
           <li class="nav-item">

@@ -112,7 +112,6 @@ include("include/response.php");
 
 <?php
 if(isset($_POST["submit"])){
-
   $type = $_POST["type"]; // 1 for admin & 2 for shopkeeper
   $email=validateInput($_POST["email"]);
   $pass=Encryption::Encrypt($_POST["pass"]);
@@ -121,9 +120,15 @@ if(isset($_POST["submit"])){
 
     $qry=DBHelper::get("SELECT * FROM `admin` WHERE email='{$email}' and pass='{$pass}' and account_status = 0");
     if($qry->num_rows > 0){
+
+      $company = DBHelper::get("SELECT * FROM `company_info` where id = 1000")->fetch_assoc();
+      $_SESSION['company'] = $company;
+      $_SESSION['company_id'] = $company['id'];
+
       $qry=$qry->fetch_assoc();
       $_SESSION["isAdmin"]=$qry["id"];  
       $_SESSION["type"]=$qry["type"];  
+      $_SESSION["user"]=$qry
       ?>
        <script>
          location.href="dashboard";
@@ -141,8 +146,14 @@ if(isset($_POST["submit"])){
     // shopkeeper
     $qry=DBHelper::get("SELECT * FROM `shopkeeper` WHERE mobile='{$email}' and pass='{$pass}' and status = 0");
     if($qry->num_rows > 0){
+      
+      $company = DBHelper::get("SELECT * FROM `company_info` where id = 1000")->fetch_assoc();
+      $_SESSION['company'] = $company;
+      $_SESSION['company_id'] = $company['id'];
+
       $qry=$qry->fetch_assoc();
       $_SESSION["isAdmin"]=$qry["id"];  
+      $_SESSION["user"]=$qry;  
       $_SESSION["type"]='3';  
       ?>
        <script>

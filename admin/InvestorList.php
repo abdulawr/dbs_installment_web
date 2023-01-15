@@ -24,12 +24,12 @@ elseif($type == "4"){
 else{
     $qry="SELECT * FROM `investor`";
 }
-
+$qry .= " and company_id = '{$_SESSION["company_id"]}' order by id desc";
 $customer=DBHelper::get($qry);
 }
 
 else{
-$customer=DBHelper::get("SELECT * FROM `investor`");
+$customer=DBHelper::get("SELECT * FROM `investor` where company_id = '{$_SESSION["company_id"]}' order by id desc");
 }
 ?>
 
@@ -50,7 +50,7 @@ $customer=DBHelper::get("SELECT * FROM `investor`");
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 titleBackground pt-1 pb-1 text-center">
             <h1>Investor List</h1>
           </div>
         </div>
@@ -154,7 +154,7 @@ $customer=DBHelper::get("SELECT * FROM `investor`");
       "paging": true,
       "lengthChange": false,
       "searching": false,
-      "ordering": true,
+      "ordering": false,
       "info": true,
       "autoWidth": false,
       "responsive": true,

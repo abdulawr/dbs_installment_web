@@ -20,7 +20,7 @@ $app=DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-8 bg-success pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+          <div class="col-sm-12 titleBackground pt-1 pb-1 text-center" >
             <h1 >Edit application</h1>
           </div>
         </div>
@@ -47,19 +47,19 @@ $app=DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
             <input required name="age"  type="number" maxlength="3"  class="form-control" placeholder="Age" value="<?php echo $app["age"];?>">
             </div>
             <div>
-            <label for="" class="urdu" style="float: right;">ماہانہ آمدنی</label>
-            <input required name="monthly_income"  type="text"  class="form-control urdu" placeholder="ماہانہ آمدنی" value="<?php echo $app["monthly_income"];?>">
+            <label for=""  >Monthly Income</label>
+            <input required name="monthly_income"  type="text"  class="form-control " placeholder="Monthly Income" value="<?php echo $app["monthly_income"];?>">
             </div>
             <div class="col">
-            <label for="" class="urdu" style="float: right;">کاروبار کی قسم</label>
-            <input required name="business type"  type="text"  class="form-control urdu" placeholder="کاروبار کی قسم" value="<?php echo $app["business_type"];?>">
+            <label for="" >Business Type</label>
+            <input required name="business type"  type="text"  class="form-control " placeholder="Business Type" value="<?php echo $app["business_type"];?>">
             </div>
         </div>
 
         <div class="row mt-4">
             <div class="col">
-            <label for="" class="urdu" style="float: right;">کاروباری پتہ</label>
-            <textarea required name="bus_address" class="form-control urdu" id="exampleFormControlTextarea1" rows="3" placeholder="کاروباری پتہ">
+            <label for="">Business Address</label>
+            <textarea required name="bus_address" class="form-control " id="exampleFormControlTextarea1" rows="3" placeholder="Business Address">
             <?php echo $app["business_address"];?>
             </textarea>
             </div>
@@ -72,11 +72,11 @@ $app=DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
 
         <div class="row mt-1">
             <div class="col">
-            <label for="" class="urdu" style="float: right;" >سامان کا نام</label>
-            <input required name="product_name"  type="text"  class="form-control urdu" placeholder="سامان کا نام" value="<?php echo $app["product_name"];?>">
+            <label for="" >Item Name</label>
+            <input required name="product_name"  type="text"  class="form-control" placeholder="Item Name" value="<?php echo $app["product_name"];?>">
             </div>
             <div class="col">
-            <label for="" class="urdu" style="float: right;">کمپنی کا نام</label>
+            <label for="">Select Company</label>
             <select name="company_name_id" class="form-control" id="exampleFormControlSelect1">
             <?php
             $data = DBHelper::get("select * from companies order by id asc");
@@ -99,7 +99,7 @@ $app=DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
             </div>
            
             <div class="col">
-            <label for="" class="urdu" style="float: right;">ماڈل نمبر</label>
+            <label for="">Model Numer (optional)</label>
             <input required name="model_number"  type="number"  class="form-control" placeholder="Model number" value="<?php echo $app["model_no"];?>">
             </div>
         </div>
@@ -107,7 +107,7 @@ $app=DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
         <div class="row mt-4">
            
             <div class="col">
-            <label for="" class="urdu" style="float: right;">سامان کی قسم</label>
+            <label for="">Select Item Type</label>
             <select name="item_type" class="form-control" id="exampleFormControlSelect1">
             <?php
             $data = DBHelper::get("select * from item_type order by id asc");
@@ -131,9 +131,9 @@ $app=DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
         </div>
 
 
-        <div class="row mt-4">
+        <div class="row mt-4" style="flex-direction:row-reverse;">
             <div class="col">
-            <label for="" class="urdu" style="float: right;">کل قیمت</label>
+            <label for="">Total Price</label>
             <input required name="total_price" value="<?php echo $app["total_price"]; ?>"  type="number"  id="total_price" class="form-control" placeholder="Total price">
             </div>
             
@@ -143,32 +143,32 @@ $app=DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
             </div>
            
             <div class="col">
-            <label for="" class="urdu" style="float: right;">سامان کی قیمت</label>
+            <label for="">Item price</label>
             <input required  name="orginal_price" value="<?php echo $app["product_orginal_price"]; ?>"  type="number"  class="form-control" id="item_price" placeholder="Item price">
             </div>
         </div>
 
-        <div class="row mt-4">
+        <div class="row mt-4" style="flex-direction:row-reverse;">
             <div class="col">
-            <label for="" class="urdu" style="float: right;">پہلی ادائیگی</label>
+            <label for="" >Advance payment</label>
             <input required name="advance_payment" value="<?php echo $app["advance_payment"]; ?>"  type="number" id="first_installment"  class="form-control" placeholder="Advance payment">
             </div>
 
             <div class="col">
-            <label for="" class="urdu" style="float: right;">ماہانہ ادائیگی</label>
+            <label for=""  >Monthly payments</label>
             <input required name="monthly_payment" value="<?php echo $app["monthly_payment"]; ?>"  type="number" id="monthly_payment"  class="form-control" placeholder="Monthly payments">
             </div>
            
             <div class="col">
-            <label for="" class="urdu" style="float: right;">قسط مہینوں</label>
+            <label for=""  >Installment months</label>
             <input required value="<?php echo $app["installment_months"]; ?>" name="install_months"  type="number" id="installment_month"  class="form-control" placeholder="Installment months">
             </div>
         </div>
 
         <div class="row mt-4">
             <div class="col">
-            <label for="" class="urdu" style="float: right;">ریف بیس</label>
-            <input value="<?php echo $app["ref_by"]; ?>"  name="ref_by" type="text"  class="form-control urdu" placeholder="Ref by">
+            <label for=""  >Ref by</label>
+            <input value="<?php echo $app["ref_by"]; ?>"  name="ref_by" type="text"  class="form-control" placeholder="Ref by">
             </div>
         </div>
 
@@ -229,29 +229,29 @@ if(isset($_GET["msg"])){
          ' <input name="per'+count+'" type="hidden" required value="1">'+
          '<div class="row mt-4 mb-4">'+
             '<div class="col">'+
-            '<label for="" class="urdu" style="float: right;">موبائل نمبر</label>'+
+            '<label for=""  style="float: right;">موبائل نمبر</label>'+
             '<input required name="per_mobile'+count+'" type="number"  class="form-control" placeholder="Mobile">'+
             '</div>'+
 
             '<div class="col">'+
-            '<label for="" class="urdu" style="float: right;">قومی شناختی کارڈ</label>'+
+            '<label for=""  style="float: right;">قومی شناختی کارڈ</label>'+
             '<input required name="per_cnic'+count+'" type="number"  class="form-control" placeholder="CNIC">'+
             '</div>'+
            
             '<div class="col">'+
-            '<label for="" class="urdu" style="float: right;">نام</label>'+
-            '<input required name="per_name'+count+'" type="text"  class="form-control urdu" placeholder="نام">'+
+            '<label for=""  style="float: right;">نام</label>'+
+            '<input required name="per_name'+count+'" type="text"  class="form-control " placeholder="نام">'+
             '</div>'+
         '</div>'+
         '<div class="row mt-4 mb-4">'+
             '<div class="col">'+
-            '<label for="" class="urdu" style="float: right;">کاروباری پتہ</label>'+
-            '<input required name="per_address'+count+'" type="text"  class="form-control urdu" placeholder="کاروباری پتہ">'+
+            '<label for=""  style="float: right;">کاروباری پتہ</label>'+
+            '<input required name="per_address'+count+'" type="text"  class="form-control " placeholder="کاروباری پتہ">'+
             '</div>'+
            
             '<div class="col">'+
-            '<label for="" class="urdu" style="float: right;">کاروبار کی قسم</label>'+
-            '<input  name="per_bussiness_type'+count+'" type="text"  class="form-control urdu" placeholder="کاروبار کی قسم">'+
+            '<label for=""  style="float: right;">کاروبار کی قسم</label>'+
+            '<input  name="per_bussiness_type'+count+'" type="text"  class="form-control" placeholder="کاروبار کی قسم">'+
             '</div>'+
         '</div>'+
 
@@ -372,7 +372,7 @@ if(isset($_POST["update"])){
  advance_payment = {$advance_payment},
  monthly_payment = {$monthly_payment},
  installment_months = {$install_months},
- ref_by = '{$ref_by}' WHERE id = {$ID}";
+ ref_by = '{$ref_by}' WHERE id = {$ID} and company_id = '{$_SESSION["company_id"]}' ";
 
  if(DBHelper::set($query)){
   showMessage("Action perform successfull");

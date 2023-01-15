@@ -1,12 +1,12 @@
 <?php include("include/header.php");
 
 $id = DBHelper::escape($_GET["ID"]);
-$investor = DBHelper::get("select * from customer where id = {$id}")->fetch_assoc();
+$investor = DBHelper::get("select * from customer where id = {$id} and company_id = '{$_SESSION["company_id"]}' ")->fetch_assoc();
 
 $customer=DBHelper::get("SELECT customer.id AS 'cusID',customer.name,customer.mobile,companies.name 
 as 'comp',item_type.name as 'item',application.* from application INNER JOIN 
 customer on customer.id = cusID INNER JOIN companies on companies.id = companyID 
-INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id};");
+INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} and application.company_id = '{$_SESSION["company_id"]}' ");
 
 ?>
 
@@ -309,7 +309,7 @@ if(isset($_POST["submit"])){
 
     $file = $_FILES["investorImage"];
 
-    if(DBHelper::set("UPDATE `customer` SET `name`='{$name}',`cnic`='{$cnic}',`mobile`='{$mobile}',`address`='{$address}' WHERE id =$id ")){
+    if(DBHelper::set("UPDATE `customer` SET `name`='{$name}',`cnic`='{$cnic}',`mobile`='{$mobile}',`address`='{$address}' WHERE id =$id and company_id = '{$_SESSION["company_id"]}' ")){
      
       if(!empty($file["name"]) && $file["size"] > 0){
         $fileName = explode(".",$investor["image"])[0];
@@ -320,7 +320,7 @@ if(isset($_POST["submit"])){
         $fileName .=".".$type;
 
         if(move_uploaded_file($file["tmp_name"],"../images/customer/".$fileName)){
-          DBHelper::set("UPDATE `customer` SET `image`='{$fileName}' where id = {$id}");
+          DBHelper::set("UPDATE `customer` SET `image`='{$fileName}' where id = {$id} and company_id = '{$_SESSION["company_id"]}'");
           if(trim($ttps) != trim($type)){
             unlink("../images/customer/".$ff.".".$ttps);
           }

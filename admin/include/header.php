@@ -12,14 +12,22 @@ include("../include/DBHelper.php");
 include("../include/Encryption.php");
 include("../include/HelperFunction.php");
 include("include/response.php");
+
+if(isset($_GET["cmp"]) && !empty($_GET["cmp"])){
+   $cmp = DBHelper::escape($_GET["cmp"]);
+   $company = DBHelper::get("SELECT * FROM `company_info` where id = '$cmp'")->fetch_assoc();
+   $_SESSION['company'] = $company;
+   $_SESSION['company_id'] = $company['id'];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DBS INSTALMENT</title>
-  <link rel="icon" href="../images/favicon.ico" type="image/x-icon">
+  <title><?php echo $_SESSION["company"]["name"];?></title>
+  <link rel="shortcut icon" type="image/jpg" href="c_images/<?php echo $_SESSION['company']['logo'];?>"/>
   
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -42,6 +50,9 @@ include("include/response.php");
   <!-- summernote -->
   <link rel="stylesheet" href="plugins/summernote/summernote-bs4.min.css">
 
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
   <style>
 
 @font-face {
@@ -53,6 +64,13 @@ include("include/response.php");
     font-family: urdu_fon;
     direction: rtl;
     text-align: right;
+  }
+
+  .titleBackground{
+    background: #0F2027;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    color:white;
   }
 
   </style>

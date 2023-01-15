@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("../../include/conn.php");
 include("../../include/DBHelper.php");
 include("../../include/Encryption.php");
@@ -6,6 +7,8 @@ include("../../include/HelperFunction.php");
 
 $cusID = $_GET["cusID"];
 $date = date("Y-m-d h:i:s");
+
+$company_id = $_SESSION["company_id"];
 
 $monthly_income =   DBHelper::escape($_POST["monthly_income"]);
 $business_type =    DBHelper::escape($_POST["business_type"]);
@@ -40,7 +43,9 @@ total_price,
 installment_months,
 monthly_payment,
 advance_payment,
-ref_by) VALUES (
+ref_by,
+company_id
+) VALUES (
     '{$item_desp}',
    $cusID,
     $age,
@@ -58,7 +63,8 @@ ref_by) VALUES (
     $install_months,
     $monthly_payment,
     $advance_payment,
-    '{$ref_by}'
+    '{$ref_by}',
+    '{$company_id}'
 );";
 
 if(DBHelper::set($qry)){
@@ -127,7 +133,9 @@ if(DBHelper::set($qry)){
             `image`, 
             `cnic_image`, 
             `business_card_image`,
-            `appID`) VALUES (
+            `appID`,
+             company_id
+            ) VALUES (
                 '{$fname}',
                 '{$org_address}',
                 '{$name}',
@@ -138,7 +146,8 @@ if(DBHelper::set($qry)){
                 '{$Proof_Image_Name}',
                 '{$Proof_CNIC_Image}',
                 '{$Proof_Bus_Card}',
-                 $app_ID
+                 $app_ID,
+                 $company_id
             )");
     
         }
