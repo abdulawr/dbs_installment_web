@@ -4,11 +4,12 @@ if(isset($_POST["submit"]) && isset($_POST["id"])){
 $qry="";
 $id=$_POST["id"];
 $qry="select * from accessories where id = {$id}";
+$qry .= " and company_id = '{$_SESSION["company_id"]}'";
 $customer=DBHelper::get($qry);
 }
 
 else{
-$customer=DBHelper::get("select * from accessories");
+$customer=DBHelper::get("select * from accessories where company_id = '{$_SESSION["company_id"]}'");
 }
 ?>
 
@@ -29,7 +30,7 @@ $customer=DBHelper::get("select * from accessories");
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 titleBackground rounded pt-1 pb-1 text-center" >
             <h1>Customer List</h1>
           </div>
         </div>

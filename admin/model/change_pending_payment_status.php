@@ -6,8 +6,8 @@ include("../../include/HelperFunction.php");
 
 if(isset($_GET["ID"]) && isset($_GET["investID"])){
 
- if(DBHelper::set("UPDATE application_investor_pending_payment set status = 1 WHERE id = {$_GET["ID"]} and investorID = {$_GET["investID"]}")){
-   $payment = DBHelper::get("SELECT * FROM `application_investor_pending_payment` WHERE id = {$_GET["ID"]} and investorID = {$_GET["investID"]}")->fetch_assoc();
+ if(DBHelper::set("UPDATE application_investor_pending_payment set status = 1 WHERE id = {$_GET["ID"]} and investorID = {$_GET["investID"]} and company_id = '{$_SESSION["company_id"]}'")){
+   $payment = DBHelper::get("SELECT * FROM `application_investor_pending_payment` WHERE id = {$_GET["ID"]} and investorID = {$_GET["investID"]} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
    if(DBHelper::set("UPDATE `investor_account` set `balance`= balance + {$payment["total_amount"]} WHERE investorID = {$_GET["investID"]}")){
     ?>
     <script>
@@ -18,7 +18,7 @@ if(isset($_GET["ID"]) && isset($_GET["investID"])){
     <?php
    } 
    else{
-    DBHelper::set("UPDATE application_investor_pending_payment set status = 0 WHERE id = {$_GET["ID"]} and investorID = {$_GET["investID"]}");  
+    DBHelper::set("UPDATE application_investor_pending_payment set status = 0 WHERE id = {$_GET["ID"]} and investorID = {$_GET["investID"]} and company_id = '{$_SESSION["company_id"]}'");  
     ?>
     <script>
         var ID = "<?php echo $_GET["investID"];?>"

@@ -14,7 +14,7 @@
   if(isset($_POST["submit"]) && isset($_POST["id"])){
     $qry="";
     $id=$_POST["id"];
-    $qry="SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$id}";
+    $qry="SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$id} and dbs_shop_stock.company_id = '{$_SESSION["company_id"]}'";
     $stock=DBHelper::get($qry);
   }
   ?>
@@ -25,7 +25,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center" >
             <h1>Generate Bill</h1>
           </div>
         </div>
@@ -62,37 +62,34 @@
             <div class="card-body">
              <div class="container">
 
-                 <div class="row">
-                     
-                        <p class="col"><b>ID: </b> <span class="ml-5"><?php echo $stock["id"];?></span></p>
-                        <p class="col"><b>Ram: </b> <span class="ml-5"><?php echo $stock["ram"];?>GB</span></p>
-                        <p class="col"><b>Memory: </b> <span class="ml-5"><?php echo $stock["memory"];?>GB</span></p>
-                    
+             <div class="row">
+                 <div class="col">
+                        <p class="col-12 mb-1"><b>ID: </b> <span class="ml-2"><?php echo $stock["id"];?></span></p>
+                        <p class="col-12 mb-1"><b>Ram: </b> <span class="ml-2"><?php echo $stock["ram"];?>GB</span></p>
+                        <p class="col-12 mb-1"><b>Memory: </b> <span class="ml-2"><?php echo $stock["memory"];?>GB</span></p>
                  </div>
 
-                 <div class="row">
-                     
-                 <p class="col"><b>Quantity: </b> <span class="ml-5"><?php echo $stock["quantity"];?></span></p>
-                     <p class="col"><b>Sim: </b> <span class="ml-5"><?php echo $stock["sim"];?></span></p>
-                     <p class="col"><b>Network: </b> <span class="ml-5"><?php echo $stock["network"];?></span></p>
-                 
-              </div>
+                 <div class="col">
+                     <p class="col-12 mb-1"><b>Quantity: </b> <span class="ml-2"><?php echo $stock["quantity"];?></span></p>
+                     <p class="col-12 mb-1"><b>Sim: </b> <span class="ml-2"><?php echo $stock["sim"];?></span></p>
+                     <p class="col-12 mb-1"><b>Network: </b> <span class="ml-2"><?php echo $stock["network"];?></span></p>
+                </div>
+             </div>
 
-              <div class="row">
-                     
-                     <p class="col"><b>Fringerprint: </b> <span class="ml-5"><?php echo ($stock["fringerprint"] == 0)?"Yes":"NO";?></span></p>
-                     <p class="col"><b>Front Camera: </b> <span class="ml-5"><?php echo $stock["font_camera"];?>MP</span></p>
-                     <p class="col"><b>Company: </b> <span class="ml-5"><?php echo ucwords($stock["comp"]);?></span></p>
-                 
-              </div>
+                
+                <div class="row">
+                <div class="col"> 
+                     <p class="col-12 mb-1"><b>Fringerprint: </b> <span class="ml-2"><?php echo ($stock["fringerprint"] == 0)?"Yes":"NO";?></span></p>
+                     <p class="col-12 mb-1"><b>Front Camera: </b> <span class="ml-2"><?php echo $stock["font_camera"];?>MP</span></p>
+                     <p class="col-12 mb-1"><b>Company: </b> <span class="ml-2"><?php echo ucwords($stock["comp"]);?></span></p>
+                </div>
 
-              <div class="row">
-                     
-                     <p class="col"><b>Back Camera: </b> <span class="ml-5"><?php echo $stock["back_camera"];?>MP</span></p>
-                     <p class="col"><b>Buying Price: </b> <span class="ml-5"><?php echo $stock["buy_price"];?></span></p>
-                     <p class="col"><b>Selling Price: </b> <span class="ml-5"><?php echo $stock["selling_price"];?></span></p>
-                 
-              </div>
+                <div class="col">
+                     <p class="col-12 mb-1"><b>Back Camera: </b> <span class="ml-2"><?php echo $stock["back_camera"];?>MP</span></p>
+                     <p class="col-12 mb-1"><b>Buying Price: </b> <span class="ml-2"><?php echo $stock["buy_price"];?></span></p>
+                     <p class="col-12 mb-1"><b>Selling Price: </b> <span class="ml-2"><?php echo $stock["selling_price"];?></span></p> 
+                </div>
+                </div>
 
              </div>
             </div>
@@ -151,7 +148,7 @@ if(isset($_POST["stockID"]) && isset($_POST["name"]) && isset($_POST["mobile"]))
  $name = $_POST["name"];
  $mobile = $_POST["mobile"];
  $date = date("Y-m-d");
- if(DBHelper::set("INSERT INTO `db_shop_buy_request`(`cus_name`, `date`, `cus_mobile`, `stockID`) VALUES ('{$name}','{$date}','{$mobile}',{$stockID})")){
+ if(DBHelper::set("INSERT INTO `db_shop_buy_request`(`cus_name`, `date`, `cus_mobile`, `stockID`,company_id) VALUES ('{$name}','{$date}','{$mobile}',{$stockID},'{$_SESSION["company_id"]}')")){
   showMessage("Request generated successfully",true);
  }
  else{

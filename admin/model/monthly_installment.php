@@ -12,21 +12,23 @@ if(isset($_POST["appID"]) && isset($_POST["amount"])){
   $adminID = $_SESSION["isAdmin"];
   $adminType = $_SESSION["type"];
   $date = date("Y-m-d");
+
+  $company_id = $_SESSION["company_id"];
  
-  $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID}");
+  $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = $company_id ");
   if($check_admin_account->num_rows <= 0){
-   DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`) VALUES (0,{$adminID})");
+   DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES (0,{$adminID},$company_id)");
   }
 
-  if(DBHelper::set("INSERT INTO `application_installment`(`appID`, `date`, `amount`, `type`) VALUES ($appID,'{$date}',$amount,'I')")){
+  if(DBHelper::set("INSERT INTO `application_installment`(`appID`, `date`, `amount`, `type`,company_id) VALUES ($appID,'{$date}',$amount,'I',$company_id)")){
     if($adminType == 2){
-        DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID}");
+        DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
       }
       else{
-        DBHelper::set("UPDATE company_account set amount=amount+ {$amount}");
+        DBHelper::set("UPDATE company_account set amount=amount+ {$amount} and id = $company_id");
       }
     
-      DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID) VALUES ($amount,'{$date}',2,'customer',$adminID,$appID)");
+      DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID,company_id) VALUES ($amount,'{$date}',2,'customer',$adminID,$appID,$company_id)");
     
       ?>
       <script>

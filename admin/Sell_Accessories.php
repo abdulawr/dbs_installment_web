@@ -14,7 +14,7 @@
   if(isset($_POST["submit"]) && isset($_POST["id"])){
     $qry="";
     $id=$_POST["id"];
-    $qry="select * from accessories where id = {$id} and quantity > 0";
+    $qry="select * from accessories where id = {$id} and quantity > 0 and company_id = '{$_SESSION["company_id"]}'";
     $stock=DBHelper::get($qry);
   }
 
@@ -132,15 +132,15 @@ if(isset($_POST["generatebill"]) && isset($_POST["price"])){
  $stockID = $_POST["stockID"];
  $date = date("Y-m-d");
  $price = $_POST["price"];
- $prod = DBHelper::get("SELECT * FROM `accessories` WHERE id = {$stockID}")->fetch_assoc();
+ $prod = DBHelper::get("SELECT * FROM `accessories` WHERE id = {$stockID} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
  $sellID = $_SESSION["isAdmin"];
 
  if($_SESSION["type"] == "3"){
    // Shopkeeper
 
-   if(DBHelper::set("UPDATE accessories set quantity = quantity - 1  where id = {$stockID}")){
-    DBHelper::set("INSERT INTO `accessories_account`(`amount`, `date`, `accessID`, `status`, `sellID`, `type`) VALUES ({$price},'{$date}',{$stockID},0,{$sellID},0)");
-    DBHelper::set("INSERT INTO `accessories_transaction`(`date`, `sell_price`, `buy_price`, `accessID`, `quantity`) VALUES ('{$date}',{$price},{$prod["buying"]},{$stockID},1)");
+   if(DBHelper::set("UPDATE accessories set quantity = quantity - 1  where id = {$stockID} and company_id = '{$_SESSION["company_id"]}'")){
+    DBHelper::set("INSERT INTO `accessories_account`(`amount`, `date`, `accessID`, `status`, `sellID`, `type`,company_id) VALUES ({$price},'{$date}',{$stockID},0,{$sellID},0,'{$_SESSION["company_id"]}')");
+    DBHelper::set("INSERT INTO `accessories_transaction`(`date`, `sell_price`, `buy_price`, `accessID`, `quantity`,company_id) VALUES ('{$date}',{$price},{$prod["buying"]},{$stockID},1,'{$_SESSION["company_id"]}')");
     showMessage("Action perform successfull",true);
    }
    else{
@@ -150,9 +150,9 @@ if(isset($_POST["generatebill"]) && isset($_POST["price"])){
  }
  elseif($_SESSION["type"] == "2"){
   // sub admin
-  if(DBHelper::set("UPDATE accessories set quantity = quantity - 1  where id = {$stockID}")){
-    DBHelper::set("INSERT INTO `accessories_account`(`amount`, `date`, `accessID`, `status`, `sellID`, `type`) VALUES ({$price},'{$date}',{$stockID},0,{$sellID},1)");
-    DBHelper::set("INSERT INTO `accessories_transaction`(`date`, `sell_price`, `buy_price`, `accessID`, `quantity`) VALUES ('{$date}',{$price},{$prod["buying"]},{$stockID},1)");
+  if(DBHelper::set("UPDATE accessories set quantity = quantity - 1  where id = {$stockID} and company_id = '{$_SESSION["company_id"]}'")){
+    DBHelper::set("INSERT INTO `accessories_account`(`amount`, `date`, `accessID`, `status`, `sellID`, `type`,company_id) VALUES ({$price},'{$date}',{$stockID},0,{$sellID},1,'{$_SESSION["company_id"]}')");
+    DBHelper::set("INSERT INTO `accessories_transaction`(`date`, `sell_price`, `buy_price`, `accessID`, `quantity`,company_id) VALUES ('{$date}',{$price},{$prod["buying"]},{$stockID},1,'{$_SESSION["company_id"]}')");
     showMessage("Action perform successfull",true);
    }
    else{
@@ -162,10 +162,10 @@ if(isset($_POST["generatebill"]) && isset($_POST["price"])){
  }
  else{
    // super admin
-   if(DBHelper::set("UPDATE accessories set quantity = quantity - 1  where id = {$stockID}")){
-    DBHelper::set("UPDATE dbs_shop_account set balance=balance + {$price} where status = 0");
-    DBHelper::set("UPDATE dbs_shop_account set balance=balance - {$prod["buying"]} where status = 1");
-    DBHelper::set("INSERT INTO `accessories_transaction`(`date`, `sell_price`, `buy_price`, `accessID`, `quantity`) VALUES ('{$date}',{$price},{$prod["buying"]},{$stockID},1)");
+   if(DBHelper::set("UPDATE accessories set quantity = quantity - 1  where id = {$stockID} and company_id = '{$_SESSION["company_id"]}'")){
+    DBHelper::set("UPDATE dbs_shop_account set balance=balance + {$price} where status = 0 and company_id = '{$_SESSION["company_id"]}'");
+    DBHelper::set("UPDATE dbs_shop_account set balance=balance - {$prod["buying"]} where status = 1 and company_id = '{$_SESSION["company_id"]}'");
+    DBHelper::set("INSERT INTO `accessories_transaction`(`date`, `sell_price`, `buy_price`, `accessID`, `quantity`,company_id) VALUES ('{$date}',{$price},{$prod["buying"]},{$stockID},1,'{$_SESSION["company_id"]}')");
     showMessage("Action perform successfull",true);
    }
    else{

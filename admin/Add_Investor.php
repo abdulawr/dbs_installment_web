@@ -94,7 +94,7 @@ if (isset($_POST["addInverstor"])) {
   $fileType = explode("/",$file["type"])[1];
   $filename=RandomString(50).".".$fileType;
   
-  $check = DBHelper::get("SELECT id FROM `investor` WHERE cnic = '{$cnic}'");
+  $check = DBHelper::get("SELECT id FROM `investor` WHERE cnic = '{$cnic}' and company_id = '{$_SESSION["company_id"]}'");
   if($check->num_rows > 0){
    showMessage("Account already exist with this CNIC",false);
   }

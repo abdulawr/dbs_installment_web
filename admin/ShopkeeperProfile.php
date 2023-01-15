@@ -1,6 +1,6 @@
 <?php include("include/header.php");
 $id = DBHelper::escape($_GET["ID"]);
-$investor = DBHelper::get("select * from shopkeeper where id = {$id}")->fetch_assoc();
+$investor = DBHelper::get("select * from shopkeeper where id = {$id} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
 $balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 0 and sellID = {$id}")->fetch_assoc()["total"];
 ?>
 

@@ -17,7 +17,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded pt-1 pb-1 text-center titleBackground" >
             <h1>Add mobile category</h1>
           </div>
         </div>
@@ -204,13 +204,13 @@ if(isset($_POST["submit"]) && isset($_POST["quantity"]) && isset($_POST["company
   
     $date = date("Y-m-d");
 
-    $qry = "INSERT INTO `dbs_shop_stock`(`companyID`, `ram`, `memory`, `sim`, `network`, `fringerprint`, `font_camera`, `back_camera`, `buy_price`, `selling_price`, `quantity`, `date`) 
-    VALUES ($company,$ram,$memory,'{$sim}','{$network}',$fringerprint,'{$front_camera}','{$back_camera}',$buying_price,$selling_price,$quantity,'{$date}')";
+    $qry = "INSERT INTO `dbs_shop_stock`(`companyID`, `ram`, `memory`, `sim`, `network`, `fringerprint`, `font_camera`, `back_camera`, `buy_price`, `selling_price`, `quantity`, `date`,company_id) 
+    VALUES ($company,$ram,$memory,'{$sim}','{$network}',$fringerprint,'{$front_camera}','{$back_camera}',$buying_price,$selling_price,$quantity,'{$date}','{$_SESSION["company_id"]}')";
    
     if(DBHelper::set($qry)){
       $id = $con->insert_id;
       $total = ceil($buying_price * $quantity);
-      if(DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$total} WHERE status = 1 and id = 2")){
+      if(DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$total} WHERE status = 1 and company_id = '{$_SESSION["company_id"]}'")){
        showMessage("Stock item successfully, Please add this stock id to every box or mobile in this stock = $id",true);
        ?>
         <script>
@@ -221,7 +221,7 @@ if(isset($_POST["submit"]) && isset($_POST["quantity"]) && isset($_POST["company
        <?php
       }
       else{
-        DBHelper::get("delete from dbs_shop_stock where id = {$id}");
+        DBHelper::get("delete from dbs_shop_stock where id = {$id} and company_id = '{$_SESSION["company_id"]}'");
         showMessage("Something went wrong try again, adding stock value",false);
       }
     }

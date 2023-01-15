@@ -24,12 +24,13 @@ elseif($type == "4"){
 else{
     $qry="SELECT * FROM `db_shop_buy_request` where status = 1";
 }
+$qry .= " and company_id = '{$_SESSION["company_id"]}'";
 
 $customer=DBHelper::get($qry);
 }
 
 else{
-$customer=DBHelper::get("SELECT * FROM `db_shop_buy_request` where status = 1");
+$customer=DBHelper::get("SELECT * FROM `db_shop_buy_request` where status = 1 and company_id = '{$_SESSION["company_id"]}'");
 }
 ?>
 

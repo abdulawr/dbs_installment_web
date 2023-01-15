@@ -17,7 +17,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
             <h1>Add acessories</h1>
           </div>
         </div>
@@ -107,12 +107,12 @@ if(isset($_POST["submit"]) && isset($_POST["quantity"]) && isset($_POST["name"])
   
     $date = date("Y-m-d");
 
-    $qry = "INSERT INTO `accessories`(`name`, `selling`, `buying`, `quantity`) VALUES ('{$name}',$selling_price,$buying_price,$quantity)";
+    $qry = "INSERT INTO `accessories`(`name`, `selling`, `buying`, `quantity`,company_id) VALUES ('{$name}',$selling_price,$buying_price,$quantity,'{$_SESSION["company_id"]}')";
    
     if(DBHelper::set($qry)){
       $id = $con->insert_id;
       $total = ceil($buying_price * $quantity);
-      if(DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$total} WHERE status = 1 and id = 2")){
+      if(DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$total} WHERE status = 1 and company_id = '{$_SESSION["company_id"]}'")){
        showMessage("Stock item successfully, Please add this stock id to every box or mobile in this stock = $id",true);
        ?>
         <script>
@@ -123,7 +123,7 @@ if(isset($_POST["submit"]) && isset($_POST["quantity"]) && isset($_POST["name"])
        <?php
       }
       else{
-        DBHelper::get("delete from dbs_shop_stock where id = {$id}");
+        DBHelper::get("delete from dbs_shop_stock where id = {$id} and company_id = '{$_SESSION["company_id"]}'");
         showMessage("Something went wrong try again, adding stock value",false);
       }
     }

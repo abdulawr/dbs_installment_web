@@ -1,10 +1,10 @@
 <?php include("include/header.php");
 $id = $_GET["ID"];
 $investor = DBHelper::get("select * from admin where id = {$id}")->fetch_assoc();
-$balance = DBHelper::get("SELECT * FROM `admin_account` WHERE adminID = {$id}");
+$balance = DBHelper::get("SELECT * FROM `admin_account` WHERE adminID = {$id} and company_id = '{$_SESSION['company_id']}'");
 $balance = ($balance->num_rows > 0) ? $balance->fetch_assoc()["amount"] : "0";
 
-$access_balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$id}")->fetch_assoc()["total"];
+$access_balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$id} and company_id = '{$_SESSION['company_id']}'")->fetch_assoc()["total"];
 ?>
 
 <body class="hold-transition sidebar-mini">
@@ -169,7 +169,7 @@ $access_balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_a
                   <tbody>
 
                   <?php
-                  $data = DBHelper::get("SELECT * from admin_transaction WHERE adminID = {$id} and paymentStatus = 0 order by id desc");
+                  $data = DBHelper::get("SELECT * from admin_transaction WHERE adminID = {$id} and paymentStatus = 0 and company_id = '{$_SESSION["company_id"]}' order by id desc");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -277,7 +277,7 @@ $access_balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_a
                   <tbody>
 
                   <?php
-                  $data = DBHelper::get("SELECT * from admin_transaction WHERE adminID = {$id} and paymentStatus = 1 order by id desc");
+                  $data = DBHelper::get("SELECT * from admin_transaction WHERE adminID = {$id} and paymentStatus = 1 and company_id = '{$_SESSION["company_id"]}' order by id desc");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -364,7 +364,7 @@ $access_balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_a
                   <tbody>
 
                   <?php
-                  $data = DBHelper::get("SELECT * FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$id}");
+                  $data = DBHelper::get("SELECT * FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$id} and company_id = '{$_SESSION["company_id"]}'");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -409,7 +409,7 @@ $access_balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_a
                   <tbody>
 
                   <?php
-                  $data = DBHelper::get("SELECT * FROM `accessories_account` WHERE status = 1 and type = 1 and sellID = {$id}");
+                  $data = DBHelper::get("SELECT * FROM `accessories_account` WHERE status = 1 and type = 1 and sellID = {$id} and company_id = '{$_SESSION["company_id"]}'");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -454,7 +454,7 @@ $access_balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_a
                   <tbody>
 
                   <?php
-                  $data =$app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.investorID = {$id}");
+                  $data =$app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.investorID = {$id} and application.company_id = '{$_SESSION["company_id"]}'");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -533,7 +533,7 @@ $access_balance = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_a
                   <tbody>
 
                   <?php
-                  $data = DBHelper::get("SELECT investor_transaction.*,admin.name,admin.cnic FROM investor_transaction  INNER JOIN admin on adminID = admin.id WHERE investorID = {$investor["id"]} order by investor_transaction.id desc");
+                  $data = DBHelper::get("SELECT investor_transaction.*,admin.name,admin.cnic FROM investor_transaction  INNER JOIN admin on adminID = admin.id WHERE investorID = {$investor["id"]} and investor_transaction.company_id = '{$_SESSION["company_id"]}' order by investor_transaction.id desc");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>

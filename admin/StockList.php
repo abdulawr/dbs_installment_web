@@ -3,12 +3,12 @@ $customer="null";
 if(isset($_POST["submit"]) && isset($_POST["id"])){
 $qry="";
 $id=$_POST["id"];
-$qry="SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$id} and quantity > 0";
+$qry="SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$id} and quantity > 0 and dbs_shop_stock.company_id = '{$_SESSION["company_id"]}'";
 $customer=DBHelper::get($qry);
 }
 
 else{
-$customer=DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where quantity > 0");
+$customer=DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where quantity > 0 and dbs_shop_stock.company_id = '{$_SESSION["company_id"]}'");
 }
 ?>
 
@@ -29,8 +29,8 @@ $customer=DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_st
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
-            <h1>Customer List</h1>
+        <div class="col-sm-12 rounded titleBackground pt-1 pb-1 text-center" >
+            <h1>Stock List</h1>
           </div>
         </div>
       </div><!-- /.container-fluid -->

@@ -10,8 +10,8 @@
 
   <!-- Main Sidebar Container -->
   <?php include("include/slide.php");
-  $request = DBHelper::get("select * from db_shop_buy_request where id = {$_GET["ID"]}")->fetch_assoc();
-  $stock = DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$request["stockID"]}")->fetch_assoc();
+  $request = DBHelper::get("select * from db_shop_buy_request where id = {$_GET["ID"]} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
+  $stock = DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$request["stockID"]} and dbs_shop_stock.company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
   ?>
 
   <!-- Content Wrapper. Contains page content -->

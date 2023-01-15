@@ -52,9 +52,13 @@
                   <?php
                   $id = 1;
                  
-                  $data = DBHelper::get("SELECT admin.*,amount FROM admin left JOIN admin_account on adminID = admin.id;");
+                  $data = DBHelper::get("SELECT * FROM admin order by type desc");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
+                        $id = $row["id"];
+                        $balance = DBHelper::get("SELECT * FROM `admin_account` WHERE adminID = {$id} and company_id = '{$_SESSION['company_id']}'");
+                        $balance = ($balance->num_rows > 0) ? $balance->fetch_assoc()["amount"] : "0";
+
                         $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$row["id"]}");
                         $amount = ($access_pending_amount->num_rows > 0) ? $access_pending_amount->fetch_assoc()["total"] : "0";
                               if($row["type"] == 1){
@@ -96,7 +100,7 @@
                           <td><?php echo $row["email"]; ?></td>
                           <td>
                               <?php
-                               echo ($row["amount"] > 0) ? '<span class="badge badge-warning">'.$row["amount"].'</span>' : $row["amount"]; ?>
+                               echo ($balance > 0) ? '<span class="badge badge-warning">'.$balance.'</span>' : $balance; ?>
                              
                           </td>
 

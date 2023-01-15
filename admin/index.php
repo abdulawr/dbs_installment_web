@@ -178,6 +178,9 @@ if(isset($_GET["error"])){
   showMessage("Direct access is not allowed!",false);
   $_GET=[];
 }
+elseif(isset($_GET["expire"])){
+  showMessage("Session expire kindly login again!",false);
+}
 ?>
 
 

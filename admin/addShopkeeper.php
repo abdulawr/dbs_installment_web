@@ -17,7 +17,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 titleBackground rounded pt-1 pb-1 text-center">
             <h1>Add new shopkeeper</h1>
           </div>
         </div>
@@ -41,7 +41,7 @@
             <div class="form-row">
                 <div class="form-group col-md-4">
                 <label for="inputEmail4">Name</label>
-                <input name="name" required type="text" class="form-control urdu" id="inputEmail4" placeholder="نام">
+                <input name="name" required type="text" class="form-control" id="inputEmail4" placeholder="Name">
                 </div>
                 <div class="form-group col-md-4">
                 <label for="inputPassword4">CNIC</label>
@@ -54,7 +54,7 @@
             </div>
             <div class="form-group">
                 <label for="inputAddress">Address</label>
-                <input name="address" required type="text" class="form-control urdu" id="inputAddress" placeholder="پتہ">
+                <input name="address" required type="text" class="form-control" id="inputAddress" placeholder="Address">
             </div>
 
             <div class="form-group">
@@ -120,7 +120,7 @@ if(isset($_POST["submit"]) && isset($_POST["name"])){
 
      $pass = RandomString(6);
      $engPass = Encryption::Encrypt($pass);
-     if(DBHelper::set("INSERT INTO `shopkeeper`(`name`, `mobile`, `cnic`, `address`, `salary`, `pass`, `image`, `join_date`) VALUES ('{$name}','{$mobile}','{$cnic}','{$address}',$salary,'{$engPass}','{$fileName}','{$date}')")){
+     if(DBHelper::set("INSERT INTO `shopkeeper`(`name`, `mobile`, `cnic`, `address`, `salary`, `pass`, `image`, `join_date`,company_id) VALUES ('{$name}','{$mobile}','{$cnic}','{$address}',$salary,'{$engPass}','{$fileName}','{$date}','{$_SESSION["company_id"]}')")){
       showMessage("Account created successfully \n Username = {$mobile} \n Password = {$pass}");
       ?>
       <script>

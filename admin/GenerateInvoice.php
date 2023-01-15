@@ -74,32 +74,32 @@ h3{
   <!-- Navbar -->
   <?php include("include/nav.php");
    if(isset($_POST["price"]) && isset($_POST["bug_request_id"])){
-    $comp=DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
+    $comp=$_SESSION["company"];
     $price = $_POST["price"];
-    $request = DBHelper::get("SELECT * FROM `db_shop_buy_request` WHERE id = {$_POST["bug_request_id"]}")->fetch_assoc();
-    $stock = DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$request["stockID"]}")->fetch_assoc();
+    $request = DBHelper::get("SELECT * FROM `db_shop_buy_request` WHERE id = {$_POST["bug_request_id"]} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
+    $stock = DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$request["stockID"]} and dbs_shop_stock.company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
   
     $adminID = $_SESSION["isAdmin"];
     $adminType = $_SESSION["type"];
     $date = date("Y-m-d");
 
-    $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID}");
+    $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = '{$_SESSION["company_id"]}'");
     if($check_admin_account->num_rows <= 0){
-    DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`) VALUES (0,{$adminID})");
+        DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES (0,{$adminID},'{$_SESSION["company_id"]}')");
     }
 
-    if(DBHelper::set("UPDATE dbs_shop_stock SET `quantity` = `quantity` - 1 where id = {$stock["id"]}")){
+    if(DBHelper::set("UPDATE dbs_shop_stock SET `quantity` = `quantity` - 1 where id = {$stock["id"]} and company_id = '{$_SESSION["company_id"]}'")){
         if($adminType == 2){
-            DBHelper::set("UPDATE admin_account set amount = amount + {$price} WHERE adminID = {$adminID}");
+            DBHelper::set("UPDATE admin_account set amount = amount + {$price} WHERE adminID = {$adminID} and company_id = '{$_SESSION["company_id"]}'");
         } 
           else{
-            DBHelper::set("UPDATE dbs_shop_account set balance=balance + {$price} where status = 0");
+            DBHelper::set("UPDATE dbs_shop_account set balance=balance + {$price} where status = 0 and company_id = '{$_SESSION["company_id"]}'");
         }
         
-        DBHelper::set("UPDATE db_shop_buy_request set sell_price = {$price} WHERE id = {$request["id"]}");
-        DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`) VALUES ($price,'{$date}',4,'dbs_shop',$adminID)");
-        DBHelper::set("UPDATE dbs_shop_account set balance=balance - {$stock["buy_price"]} where status = 1");
-        DBHelper::set("UPDATE db_shop_buy_request set status = 1 WHERE id = {$request["id"]}");
+        DBHelper::set("UPDATE db_shop_buy_request set sell_price = {$price} WHERE id = {$request["id"]} and company_id = '{$_SESSION["company_id"]}'");
+        DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,company_id) VALUES ($price,'{$date}',4,'dbs_shop',$adminID,'{$_SESSION["company_id"]}')");
+        DBHelper::set("UPDATE dbs_shop_account set balance=balance - {$stock["buy_price"]} where status = 1 and company_id = '{$_SESSION["company_id"]}'");
+        DBHelper::set("UPDATE db_shop_buy_request set status = 1 WHERE id = {$request["id"]} and company_id = '{$_SESSION["company_id"]}'");
     }
     else{
         ?>
@@ -147,8 +147,8 @@ h3{
 
         <div class="sign container">
           <div class="row">
-            <div class="col"> <img  class="rounded img-thumbnail" width="80" height="80" src="../images/logo.png" alt="">
-             <h1 style="display:inline-block; margin-left:20px; color:brown; font-size:30px">DBS Installment</h1></div>
+            <div class="col"> <img  class="rounded img-thumbnail" width="80" height="80" src="c_images/<?php echo $_SESSION["company"]["logo"];?>" alt="">
+             <h1 style="display:inline-block; margin-left:20px; color:brown; font-size:30px"><?php echo $_SESSION["company"]["name"];?></h1></div>
            
              <div class="col">
                <div class="row">

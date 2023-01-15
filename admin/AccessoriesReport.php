@@ -17,7 +17,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-        <div class="col-sm-8 bg-info pt-1 pb-1 text-center" style="border-top-right-radius: 500px; border-bottom-right-radius: 500px;">
+        <div class="col-sm-12 rounded pt-1 pb-1 text-center titleBackground" >
             <h1>Accessories Report</h1>
           </div>
         </div>
@@ -87,11 +87,11 @@
              $year = ($_POST["year"] != '0') ? " and Year(accessories_transaction.date) = '{$_POST["year"]}'" : "";
              $search = $day.$month.$year;
 
-             $record = DBHelper::get("SELECT accessories_transaction.*,name FROM accessories INNER JOIN accessories_transaction on accessories.id = accessID where accessories_transaction.quantity != '0' {$search}");
+             $record = DBHelper::get("SELECT accessories_transaction.*,name FROM accessories INNER JOIN accessories_transaction on accessories.id = accessID where accessories_transaction.quantity != '0' {$search} and accessories_transaction.company_id = '{$_SESSION["company_id"]}'");
             }
             else{
                 $currentday = date("d");
-                $record = DBHelper::get("SELECT accessories_transaction.*,name FROM accessories INNER JOIN accessories_transaction on accessories.id = accessID where Day(accessories_transaction.date) = '{$currentday}'");
+                $record = DBHelper::get("SELECT accessories_transaction.*,name FROM accessories INNER JOIN accessories_transaction on accessories.id = accessID where Day(accessories_transaction.date) = '{$currentday}' and accessories_transaction.company_id = '{$_SESSION["company_id"]}'");
             }
             ?>
 

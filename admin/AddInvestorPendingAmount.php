@@ -1,7 +1,7 @@
 <?php include("include/header.php");
 $id = $_GET["ID"];
 $investID = $_GET["investID"];
-$details = DBHelper::get("SELECT * FROM `application_investor_pending_payment` WHERE id = {$id} and investorID = {$investID}")->fetch_assoc();
+$details = DBHelper::get("SELECT * FROM `application_investor_pending_payment` WHERE id = {$id} and investorID = {$investID} and company_id = '{$_SESSION["company_id"]}' ")->fetch_assoc();
 ?>
 
 <body class="hold-transition sidebar-mini">
@@ -85,7 +85,7 @@ if(isset($_POST["ID"]) && isset($_POST["pay"]) && isset($_POST["amount"]) && iss
   $payable = $_POST["pay"];
 
   if($amount <= $payable){
-   if(DBHelper::set("UPDATE application_investor_pending_payment set payable = payable - {$amount}, paid = paid + {$amount} WHERE id = {$ID}"))
+   if(DBHelper::set("UPDATE application_investor_pending_payment set payable = payable - {$amount}, paid = paid + {$amount} WHERE id = {$ID} and company_id = '{$_SESSION["company_id"]}'"))
    {
     DBHelper::set("UPDATE `investor_account` set `balance`= balance + {$amount} WHERE investorID = {$investID}");
     DBHelper::set("UPDATE company_account set amount = amount - {$amount}");

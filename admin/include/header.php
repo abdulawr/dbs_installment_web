@@ -13,6 +13,24 @@ include("../include/Encryption.php");
 include("../include/HelperFunction.php");
 include("include/response.php");
 
+$expireAfter = 30;
+if(isset($_SESSION['last_action'])){
+  $secondsInactive = time() - $_SESSION['last_action'];
+  $expireAfterSeconds = $expireAfter * 60;
+  if($secondsInactive >= $expireAfterSeconds){
+      session_unset();
+      session_destroy();
+      ?>
+      <script>
+        location.href="index?expire=expire";
+      </script>
+     <?php
+  }
+  
+}
+
+$_SESSION['last_action'] = time();
+
 if(isset($_GET["cmp"]) && !empty($_GET["cmp"])){
    $cmp = DBHelper::escape($_GET["cmp"]);
    $company = DBHelper::get("SELECT * FROM `company_info` where id = '$cmp'")->fetch_assoc();

@@ -1,7 +1,7 @@
 <?php include("include/header.php");
-$id = $_GET["ID"];
+$id = DBHelper::escape($_GET["ID"]);
 $investor = DBHelper::get("select * from investor where id = {$id} and company_id = '{$_SESSION["company_id"]}' ")->fetch_assoc();
-$balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorID = {$investor["id"]}")->fetch_assoc()["balance"];
+$balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorID = {$investor["id"]} and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc()["balance"];
 ?>
 
 <body class="hold-transition sidebar-mini">
@@ -155,7 +155,7 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
                   <tbody>
 
                   <?php
-                  $data = DBHelper::get("SELECT customer.*,application.id as 'appID' from customer INNER JOIN application ON customer.id = cusID WHERE application.investorID = {$id};");
+                  $data = DBHelper::get("SELECT customer.*,application.id as 'appID' from customer INNER JOIN application ON customer.id = cusID WHERE application.investorID = {$id} and application.company_id = '{$_SESSION["company_id"]}';");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -211,7 +211,7 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
                   <tbody>
 
                   <?php
-                  $data = DBHelper::get("SELECT * FROM `application_investor_pending_payment` WHERE `investorID` = {$id} order by id desc;");
+                  $data = DBHelper::get("SELECT * FROM `application_investor_pending_payment` WHERE `investorID` = {$id} and company_id = '{$_SESSION['company_id']}' order by id desc;");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -271,7 +271,7 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
                   <tbody>
 
                   <?php
-                  $data =$app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.investorID = {$id}");
+                  $data =$app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.investorID = {$id} application.company_id = '{$_SESSION["company_id"]}'");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -351,7 +351,7 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
                   <tbody>
 
                   <?php
-                  $data = DBHelper::get("SELECT investor_transaction.*,admin.name,admin.cnic FROM investor_transaction  INNER JOIN admin on adminID = admin.id WHERE investorID = {$investor["id"]} order by investor_transaction.id desc");
+                  $data = DBHelper::get("SELECT investor_transaction.*,admin.name,admin.cnic FROM investor_transaction  INNER JOIN admin on adminID = admin.id WHERE investorID = {$investor["id"]} and investor_transaction.company_id = '{$_SESSION["company_id"]}' order by investor_transaction.id desc");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>
@@ -466,7 +466,7 @@ if(isset($_POST["submit"])){
     $address = $_POST["address"];
     $id = $investor["id"];
 
-    if(DBHelper::set("UPDATE `investor` SET `name`='{$name}',`cnic`='{$cnic}',`mobile`='{$mobile}',`address`='{$address}' WHERE id =$id ")){
+    if(DBHelper::set("UPDATE `investor` SET `name`='{$name}',`cnic`='{$cnic}',`mobile`='{$mobile}',`address`='{$address}' WHERE id =$id and company_id = '{$_SESSION["company_id"]}'")){
       if(!empty($file["name"]) && $file["size"] > 0){
         $fileName = explode(".",$investor["image"])[0];
         $type=$file["type"];
@@ -475,7 +475,7 @@ if(isset($_POST["submit"])){
         $type=explode("/",$type)[1];
         $fileName .=".".$type;
         if(move_uploaded_file($file["tmp_name"],"../images/investor/".$fileName)){
-          DBHelper::set("UPDATE `investor` SET `image`='{$fileName}' where id = {$id}");
+          DBHelper::set("UPDATE `investor` SET `image`='{$fileName}' where id = {$id} and company_id = '{$_SESSION["company_id"]}'s");
           if(trim($ttps) != trim($type)){
             unlink("../images/customer/".$ff.".".$ttps);
           }

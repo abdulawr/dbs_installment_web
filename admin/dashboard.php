@@ -10,19 +10,19 @@
   <!-- Main Sidebar Container -->
   <?php include("include/slide.php");
   $app = DBHelper::get("SELECT  (
-    SELECT COUNT(id) from application WHERE status = 0
+    SELECT COUNT(id) from application WHERE status = 0 and company_id = '{$_SESSION["company_id"]}'
 ) AS pending,
 (
-    SELECT COUNT(id) from application WHERE status = 1
+    SELECT COUNT(id) from application WHERE status = 1 and company_id = '{$_SESSION["company_id"]}'
 ) AS accepted,
 (
-   SELECT COUNT(id) from application WHERE status = 3
+   SELECT COUNT(id) from application WHERE status = 3 and company_id = '{$_SESSION["company_id"]}'
 ) AS active,
 (
-   SELECT COUNT(id) from application
+   SELECT COUNT(id) from application where company_id = '{$_SESSION["company_id"]}'
 ) AS app,
 (
-  SELECT COUNT(id) from application WHERE status = 4
+  SELECT COUNT(id) from application WHERE status = 4 and company_id = '{$_SESSION["company_id"]}'
 ) AS complete")->fetch_assoc();
 
 
@@ -37,7 +37,7 @@ function get_months_between_dates(string $start_date, string $end_date): ?int
     
 }
 
-               $active_app = DBHelper::get("select * from application where status = 3");
+               $active_app = DBHelper::get("select * from application where status = 3 and company_id = '{$_SESSION["company_id"]}'");
                $cnnsss = 0;
                   while($row = $active_app->fetch_assoc()){
                    
@@ -56,10 +56,10 @@ function get_months_between_dates(string $start_date, string $end_date): ?int
 
 
 $data = DBHelper::get("SELECT  (
-  SELECT COUNT(id) from customer
+  SELECT COUNT(id) from customer where company_id = '{$_SESSION["company_id"]}'
 ) AS customer,
 (
-  SELECT COUNT(id) from investor
+  SELECT COUNT(id) from investor where company_id = '{$_SESSION["company_id"]}'
 ) AS investor,
 (
  SELECT COUNT(id) from admin where type = 1
@@ -122,22 +122,23 @@ SELECT COUNT(id) from admin where type = 2
 
         <?php
       
-        $account = DBHelper::get("SELECT * FROM `company_account` ")->fetch_assoc();
-        $pending_account = DBHelper::get("SELECT SUM(amount) as 'sum' from admin_account")->fetch_assoc();
-        ?>
+        $account = DBHelper::get("SELECT * FROM `company_account` where id = '{$_SESSION["company_id"]}'")->fetch_assoc();
+        $pending_account = DBHelper::get("SELECT SUM(amount) as 'sum' from admin_account where company_id = '{$_SESSION["company_id"]}' ");
+        $pending_account = ($pending_account->num_rows > 0) ? $pending_account->fetch_assoc()["sum"] : "0";
+       ?>
         <div class="col-4" style="border-right: 1px dotted grey;">
          <h5 class='bg-danger py-1 text-center rounded'>Company Account</h5>
          <h5><b>Balance: </b> <?php echo $account["amount"];?></h5>
-         <h5><b>Pending Balance: </b> <?php echo $pending_account["sum"];?></h5>
+         <h5><b>Pending Balance: </b> <?php echo $pending_account;?></h5>
         
          <?php
-         $pendingPayment = DBHelper::get("SELECT SUM(payable) as tot from application_investor_pending_payment WHERE `payable` > 0;");
+         $pendingPayment = DBHelper::get("SELECT SUM(payable) as tot from application_investor_pending_payment WHERE `payable` > 0 and company_id = '{$_SESSION["company_id"]}';");
          ?>
 
          <h5><b>Investor Pending: </b> <?php echo $pendingPayment->fetch_assoc()["tot"];?></h5>
 
          <?php
-         $customerPayment = DBHelper::get("SELECT id,`total_price` FROM application WHERE status = 3;");
+         $customerPayment = DBHelper::get("SELECT id,`total_price` FROM application WHERE status = 3 and company_id = '{$_SESSION['company_id']}';");
          $totalPPCUS = 0;
           while($row = $customerPayment->fetch_assoc()){
            $pp = DBHelper::get("SELECT SUM(amount) as tot from application_installment WHERE appID = {$row["id"]};");
@@ -172,8 +173,8 @@ SELECT COUNT(id) from admin where type = 2
         
 
         <?php
-        $account = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 0")->fetch_assoc();
-        $stock = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 1")->fetch_assoc();
+        $account = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 0 and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
+        $stock = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 1 and company_id = '{$_SESSION["company_id"]}'")->fetch_assoc();
         ?>
         <div class="col-4">
         <h5 class='bg-warning py-1 text-center rounded'>Shop Account</h5>
@@ -360,17 +361,17 @@ SELECT COUNT(id) from admin where type = 2
     </div>
 
     <?php
-    $dbs = DBHelper::get("SELECT  (
-      SELECT COUNT(id) from shopkeeper
+  $dbs = DBHelper::get("SELECT  (
+      SELECT COUNT(id) from shopkeeper where company_id = '{$_SESSION["company_id"]}'
   ) AS customer,
   (
-      SELECT COUNT(id) from db_shop_buy_request WHERE status = 0
+      SELECT COUNT(id) from db_shop_buy_request WHERE status = 0 and company_id = '{$_SESSION["company_id"]}'
   ) AS pending,
   (
-     SELECT COUNT(id) from db_shop_buy_request WHERE status = 1
+     SELECT COUNT(id) from db_shop_buy_request WHERE status = 1 and company_id = '{$_SESSION["company_id"]}'
   ) AS history,
   (
-  SELECT sum(quantity) from dbs_shop_stock 
+  SELECT sum(quantity) from dbs_shop_stock where company_id = '{$_SESSION["company_id"]}'
   ) AS stock")->fetch_assoc();
     ?>
 

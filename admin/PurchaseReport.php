@@ -87,11 +87,11 @@
              $year = ($_POST["year"] != '0') ? " and Year(db_shop_buy_request.date) = '{$_POST["year"]}'" : "";
              $search = $day.$month.$year;
 
-             $record = DBHelper::get("SELECT db_shop_buy_request.*,buy_price FROM `db_shop_buy_request` INNER JOIN dbs_shop_stock on dbs_shop_stock.id = stockID WHERE `status` = 1 {$search}");
+             $record = DBHelper::get("SELECT db_shop_buy_request.*,buy_price FROM `db_shop_buy_request` INNER JOIN dbs_shop_stock on dbs_shop_stock.id = stockID WHERE `status` = 1 {$search} and db_shop_buy_request.company_id = '{$_SESSION["company_id"]}'");
             }
             else{
                 $currentday = date("d");
-                $record = DBHelper::get("SELECT db_shop_buy_request.*,buy_price FROM `db_shop_buy_request` INNER JOIN dbs_shop_stock on dbs_shop_stock.id = stockID WHERE `status` = 1 and Day(db_shop_buy_request.date) = '{$currentday}'");
+                $record = DBHelper::get("SELECT db_shop_buy_request.*,buy_price FROM `db_shop_buy_request` INNER JOIN dbs_shop_stock on dbs_shop_stock.id = stockID WHERE `status` = 1 and Day(db_shop_buy_request.date) = '{$currentday}' and db_shop_buy_request.company_id = '{$_SESSION["company_id"]}'");
             }
            
             ?>

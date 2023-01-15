@@ -102,7 +102,7 @@ if(isset($_POST["submit"]) && isset($_POST["name"])){
 $type=explode("/",$type)[1];
 $arrType=["png","jpg","jpeg","gif"];
 
-$select=DBHelper::get("SELECT cnic  from customer WHERE cnic='{$cnic}'");
+$select=DBHelper::get("SELECT cnic  from customer WHERE cnic='{$cnic}' and company_id = '{$_SESSION["company_id"]}'");
 if ($select->num_rows <= 0) {
     if (in_array($type, $arrType)) {
         $imageName="customer_".$cnic.RandomString(15).".".$type;
