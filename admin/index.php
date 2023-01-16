@@ -144,17 +144,18 @@ if(isset($_POST["submit"])){
   else{
 
     // shopkeeper
-    $qry=DBHelper::get("SELECT * FROM `shopkeeper` WHERE mobile='{$email}' and pass='{$pass}' and status = 0");
+     $qry=DBHelper::get("SELECT * FROM `shopkeeper` WHERE mobile='{$email}' and pass='{$pass}' and status = 0");
     if($qry->num_rows > 0){
-      
-      $company = DBHelper::get("SELECT * FROM `company_info` where id = 1000")->fetch_assoc();
-      $_SESSION['company'] = $company;
-      $_SESSION['company_id'] = $company['id'];
 
       $qry=$qry->fetch_assoc();
       $_SESSION["isAdmin"]=$qry["id"];  
       $_SESSION["user"]=$qry;  
       $_SESSION["type"]='3';  
+
+      $company = DBHelper::get("SELECT * FROM `company_info` where id = '{$qry["company_id"]}'")->fetch_assoc();
+      $_SESSION['company'] = $company;
+      $_SESSION['company_id'] = $company['id'];
+
       ?>
        <script>
          location.href="GenerateBill";
