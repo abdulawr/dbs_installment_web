@@ -8,8 +8,8 @@
   return $data;
  }
 
- function isAdmin($id){
-  $check = DBHelper::get("select * from admin where id = {$id}");
+ function isAdmin($api_key){
+  $check = DBHelper::get("select id from app_login where api_key = '{$api_key}' and status = 1");
   return ($check->num_rows > 0) ? true : false;
  }
 

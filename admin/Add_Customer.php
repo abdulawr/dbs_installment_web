@@ -102,7 +102,7 @@ if(isset($_POST["submit"]) && isset($_POST["name"])){
 $type=explode("/",$type)[1];
 $arrType=["png","jpg","jpeg","gif"];
 
-$select=DBHelper::get("SELECT cnic  from customer WHERE cnic='{$cnic}' and company_id = '{$_SESSION["company_id"]}'");
+$select = DBHelper::get("SELECT id,cnic,company_id  from customer WHERE cnic='{$cnic}'");
 if ($select->num_rows <= 0) {
     if (in_array($type, $arrType)) {
         $imageName="customer_".$cnic.RandomString(15).".".$type;
@@ -123,7 +123,10 @@ if ($select->num_rows <= 0) {
     }
 }
 else{
-    showMessage("Customer with this CNIC exist",false);
+  $customer = $select->fetch_assoc();
+  $select = DBHelper::get("SELECT name FROM `company_info` WHERE id = '{$customer["company_id"]}'");
+  $company_name = $select->fetch_assoc()["name"];
+  showMessage("Customer with CNIC: ".$cnic." already register in ".$company_name." company with ID: ".$customer["id"],false);
 }
  
 }

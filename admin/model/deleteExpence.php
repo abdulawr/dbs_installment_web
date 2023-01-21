@@ -10,6 +10,8 @@ $expRec = DBHelper::get("SELECT * FROM `company_expense` WHERE id = {$ID} limit 
 $adminType = DBHelper::get("SELECT type FROM `admin` WHERE id = {$expRec["adminID"]}")->fetch_assoc();
 
 $amount = $expRec["amount"];
+$company_id = $_SESSION["company_id"];
+
 // super admin
 if($adminType["type"] == '1'){
   if($expRec["status"] == '0'){
@@ -29,13 +31,26 @@ else{
 
     if($expRec["status"] == '0'){
         // dbs company
-        DBHelper::set("UPDATE `admin_account` SET amount= amount - {$amount} WHERE adminID = {$expRec["adminID"]}");
+        $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = $company_id");
+        if($check_admin_account->num_rows <= 0){
+         DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES ($amount,'{$expRec["adminID"]}',$company_id)");
+        }else{
+            DBHelper::set("UPDATE `admin_account` SET amount= amount - {$amount} WHERE adminID = '{$expRec["adminID"]}' and company_id = $company_id");
+        }
+
         DBHelper::set("DELETE FROM `admin_transaction` WHERE `date` = '{$expRec["date"]}' and `adminID` = {$expRec["adminID"]} and `exp_type` = 0 and `type` = 'expence';");
         DBHelper::set("DELETE FROM `company_expense` WHERE `id` = {$ID}");
     }
     else{
         // dbs shop
-        DBHelper::set("UPDATE `admin_account` SET amount= amount - {$amount} WHERE adminID = {$expRec["adminID"]}");
+
+        $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = '{$expRec["adminID"]}' and company_id = $company_id");
+        if($check_admin_account->num_rows <= 0){
+         DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES ($amount,'{$expRec["adminID"]}',$company_id)");
+        }else{
+            DBHelper::set("UPDATE `admin_account` SET amount= amount - {$amount} WHERE adminID = {$expRec["adminID"]} and company_id = $company_id");
+        }
+        
         DBHelper::set("DELETE FROM `admin_transaction` WHERE `date` = '{$expRec["date"]}' and `adminID` = {$expRec["adminID"]} and `exp_type` = 1 and `type` = 'expence';");
         DBHelper::set("DELETE FROM `company_expense` WHERE `id` = {$ID}");
     }

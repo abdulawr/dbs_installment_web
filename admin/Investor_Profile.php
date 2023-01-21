@@ -271,7 +271,7 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
                   <tbody>
 
                   <?php
-                  $data =$app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.investorID = {$id} application.company_id = '{$_SESSION["company_id"]}'");
+                  $data =$app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.investorID = {$id} and application.company_id = '{$_SESSION["company_id"]}'");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         ?>

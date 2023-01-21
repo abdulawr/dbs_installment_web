@@ -1,9 +1,27 @@
 <?php
 include("include.php");
+
+if(!isset($_POST["type"])){
+  echo json_encode(["status"=>0,"message"=>"Invalid access!"]);
+  exit;
+}
+
+if(!isset($_POST["adminID"])){
+  echo json_encode(["status"=>0,"message"=>"Invalid access!"]);
+  exit;
+}
+
+if(!isset($_POST["api_key"])){
+  echo json_encode(["status"=>0,"message"=>"Unauthorized access!"]);
+  exit;
+}
+
 $type = validateInput($_POST["type"]);
 $adminID = validateInput($_POST["adminID"]);
+$apk_key = $_POST["api_key"];
 
-if(!empty($adminID) && !empty($type) && isAdmin($adminID)){
+
+if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
 // to verify admin
 
  // --------------------- Get admin profile start --------------------------
@@ -1126,36 +1144,9 @@ if(DBHelper::set($qry)){
  }
  // --------------------- Get admin profile End --------------------------
 
-
-
-
-  // --------------------- Get admin profile start --------------------------
-
- // --------------------- Get admin profile End --------------------------
-
-
-
-
-  // --------------------- Get admin profile start --------------------------
-
- // --------------------- Get admin profile End --------------------------
-
-
-
- // --------------------- Get admin profile start --------------------------
-
- // --------------------- Get admin profile End --------------------------
-
-
-
- // --------------------- Get admin profile start --------------------------
-
- // --------------------- Get admin profile End --------------------------
-
-
 }
 else{
-    echo json_encode(["status"=>0,"message"=>"Invalid access!"]);
+    echo json_encode(["status"=>0,"message"=>"Unauthorized access!"]);
 }
 
 ?>

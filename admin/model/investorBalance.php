@@ -36,7 +36,7 @@ if(isset($_POST["ID"]) && isset($_POST["type"])){
           DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
         } 
         else{
-          DBHelper::set("UPDATE company_account set amount=amount+ {$amount} where id=$company_id");
+          DBHelper::set("UPDATE company_account set amount=amount+ {$amount} where id = $company_id");
         }
 
         DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,company_id) VALUES ($amount,'{$date}',0,'investor',$adminID,$company_id)");
@@ -60,7 +60,7 @@ if(isset($_POST["ID"]) && isset($_POST["type"])){
   }
   elseif($tranType == 1){
       // subtrack balance
-      $investorBalance = DBHelper::get("SELECT balance FROM investor_account WHERE investorID = {$ID}")->fetch_assoc()["balance"];
+      $investorBalance = DBHelper::get("SELECT balance FROM investor_account WHERE investorID = {$ID} and company_id = $company_id")->fetch_assoc()["balance"];
       if($amount > $investorBalance){
         ?>
         <script>
@@ -71,16 +71,22 @@ if(isset($_POST["ID"]) && isset($_POST["type"])){
         <?php
       }
       else{
-        if(DBHelper::set("UPDATE investor_account SET balance = balance - {$amount} WHERE investorID = {$ID};")){
-            DBHelper::set("INSERT INTO `investor_transaction`(des,`amount`, `type`, `date`, `investorID`, `adminID`) VALUES ('{$des}',$amount,$tranType,'{$date}',$ID,$adminID)");
+        if(DBHelper::set("UPDATE investor_account SET balance = balance - {$amount} WHERE investorID = {$ID} and company_id = $company_id;")){
+            DBHelper::set("INSERT INTO `investor_transaction`(des,`amount`, `type`, `date`, `investorID`, `adminID`,company_id) VALUES ('{$des}',$amount,$tranType,'{$date}',$ID,$adminID,$company_id)");
             if($adminType == 2){
-                DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID}");
+               $chk = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = '$adminID' and company_id = '$company_id'");
+               if($chk->num_rows > 0){
+                  DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
+               }
+               else{
+                  DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`, `company_id`) VALUES ('$amount','$adminID','$company_id')");
+               }
             }
             else{
-              DBHelper::set("UPDATE company_account set amount=amount - {$amount}");
+              DBHelper::set("UPDATE company_account set amount = amount - {$amount} where id = $company_id");
             } 
 
-            DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`) VALUES ($amount,'{$date}',1,'investor',$adminID)");
+            DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,company_id) VALUES ($amount,'{$date}',1,'investor',$adminID,$company_id)");
             ?>
             <script>
                 var ID = "<?php echo $ID;?>"

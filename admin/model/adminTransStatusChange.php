@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("../../include/conn.php");
 include("../../include/DBHelper.php");
 include("../../include/Encryption.php");
@@ -8,9 +9,10 @@ if(isset($_GET["ID"]) && isset($_GET["adminID"])){
 
  $tranID = $_GET["ID"];
  $adminID = $_GET["adminID"];
+ $company_id = $_SESSION["company_id"];
 
  $tran_data = DBHelper::get("SELECT * FROM `admin_transaction` WHERE id = {$tranID} and adminID = {$adminID}");
- $adminAccount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID}")->fetch_assoc();
+ $adminAccount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID} and company_id = $company_id")->fetch_assoc();
  $adminAccount = $adminAccount["amount"];
  
  if($adminAccount > 0) {
@@ -21,15 +23,15 @@ if(isset($_GET["ID"]) && isset($_GET["adminID"])){
 
  if($tran_data["type"] == "investor"){
     if($tran_data["status"] == 0){
-        DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-    DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and amount > 0");
-        DBHelper::set("UPDATE company_account SET amount = amount + {$amount};");
+        DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+        DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and amount > 0 and company_id = $company_id");
+        DBHelper::set("UPDATE company_account SET amount = amount + {$amount} and id = $company_id;");
         $check = true;
     }
     elseif($tran_data["status"] == 1){
-        DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-        DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
-        DBHelper::set("UPDATE company_account SET amount = amount - {$amount};");
+        DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+        DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
+        DBHelper::set("UPDATE company_account SET amount = amount - {$amount} and id = $company_id;");
         $check = true;
     }
     else{
@@ -39,27 +41,27 @@ if(isset($_GET["ID"]) && isset($_GET["adminID"])){
  }
 
  elseif($tran_data["type"] == "dbs_shop"){
-    DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-    DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
-    DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$amount} where status = 0");
+    DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+    DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
+    DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$amount} where status = 0 and company_id = $company_id");
     $check = true;
  }
 
  elseif($tran_data["type"] == "customer"){
-    DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-    DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
-    DBHelper::set("UPDATE company_account SET amount = amount + {$amount};");
+    DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+    DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
+    DBHelper::set("UPDATE company_account SET amount = amount + {$amount} and id = $company_id;;");
     $check = true;
  }
  elseif($tran_data["type"] == "expence"){
-   DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-   DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
+   DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+   DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id;");
  
    if($tran_data["exp_type"] == 0){
-      DBHelper::set("UPDATE company_account SET amount = amount - {$amount};");
+      DBHelper::set("UPDATE company_account SET amount = amount - {$amount} and id = $company_id;;");
    }
    else{
-      DBHelper::set("UPDATE dbs_shop_account SET balance = balance - {$amount} WHERE status = 0");
+      DBHelper::set("UPDATE dbs_shop_account SET balance = balance - {$amount} WHERE status = 0 and company_id = $company_id");
    }
 
    $check = true;

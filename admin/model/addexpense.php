@@ -12,16 +12,18 @@ $adminType = $_SESSION["type"];
 $exp_type = $_POST["exp_type"];
 $date = date("Y-m-d");
 
+$company_id = $_SESSION["company_id"];
 
-$check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID}");
+
+$check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = $company_id");
 if($check_admin_account->num_rows <= 0){
- DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`) VALUES (0,{$adminID})");
+ DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES (0,{$adminID},$company_id)");
 }
 
 if(DBHelper::set("INSERT INTO `company_expense`(`amount`, `date`, `comment`, `adminID`,status,company_id) VALUES ($amount,'{$date}','{$comment}',$adminID,$exp_type,'{$_SESSION["company_id"]}')")){
    
     if($adminType == 2){
-        DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID}");
+        DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
       } 
       else{
         if($exp_type == 1){
@@ -32,7 +34,7 @@ if(DBHelper::set("INSERT INTO `company_expense`(`amount`, `date`, `comment`, `ad
         }
       }
 
-      DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,exp_type) VALUES ($amount,'{$date}',3,'expence',$adminID,$exp_type)");
+      DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,exp_type,company_id) VALUES ($amount,'{$date}',3,'expence',$adminID,$exp_type,$company_id)");
 
       ?>
       <script>
