@@ -60,6 +60,20 @@ if(isset($_POST["ID"]) && isset($_POST["type"])){
   }
   elseif($tranType == 1){
       // subtrack balance
+
+      $company_account = DBHelper::get("SELECT * FROM `company_account` WHERE id = $company_id");
+      $balance = $company_account->fetch_assoc()["amount"];
+      if($balance < $amount){
+        ?>
+        <script>
+            var ID = "<?php echo $ID;?>"
+            alert("Company does not have enough balance to perform this transcation");
+            location.href = "../Investor_Profile?ID="+ID;
+        </script>
+        <?php
+        exit;
+      }
+
       $investorBalance = DBHelper::get("SELECT balance FROM investor_account WHERE investorID = {$ID} and company_id = $company_id")->fetch_assoc()["balance"];
       if($amount > $investorBalance){
         ?>

@@ -14,6 +14,18 @@ $date = date("Y-m-d");
 
 $company_id = $_SESSION["company_id"];
 
+$company_account = DBHelper::get("SELECT * FROM `company_account` WHERE id = $company_id");
+$balance = $company_account->fetch_assoc()["amount"];
+
+if($balance < $amount){
+    ?>
+    <script>
+        alert("Company does not have enough balance to perform this transcation");
+        location.href = "../addExp";
+    </script>
+    <?php
+    exit;
+}
 
 $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = $company_id");
 if($check_admin_account->num_rows <= 0){
@@ -30,7 +42,7 @@ if(DBHelper::set("INSERT INTO `company_expense`(`amount`, `date`, `comment`, `ad
             DBHelper::set("UPDATE dbs_shop_account set balance = balance - {$amount} WHERE status = 0 and company_id = '{$_SESSION["company_id"]}'");
         }
         else{
-            DBHelper::set("UPDATE company_account set amount=amount - {$amount} where id = '{$_SESSION["company_id"]}'");
+            DBHelper::set("UPDATE company_account set amount = amount - {$amount} where id = '{$_SESSION["company_id"]}'");
         }
       }
 

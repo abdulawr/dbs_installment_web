@@ -4,8 +4,9 @@ $response;
 $email=$_POST["email"];
 $pass=Encryption::Encrypt($_POST["pass"]);
 $query=DBHelper::get("SELECT * from admin WHERE email='{$email}' and pass='{$pass}'");
+$company=DBHelper::get("SELECT * from company_info WHERE id=1000")->fetch_assoc();
 
-$api_key = RandomString(150);
+$api_key = RandomString(50);
 
 if($query->num_rows > 0){
     $array=$query->fetch_assoc();
@@ -14,7 +15,14 @@ if($query->num_rows > 0){
     DBHelper::set("DELETE FROM `app_login` WHERE `access_id` = '{$array["id"]}' and `status` = 1;");
     DBHelper::set("INSERT INTO `app_login`(`api_key`, `status`, `access_id`,date) VALUES ('$api_key',1,'{$array["id"]}','$date')");
     $array["pass"]=$pass;
-    $response=["status"=>1,"message"=>"Successfully Login","data"=>$array,'api_key'=>$api_key];
+    $response=[
+        "status"=>1,
+        "message"=>"Successfully Login",
+        "data"=>$array,
+        'api_key'=>$api_key,
+        'company_id' => "1000",
+        "company_name" => $company["name"]
+    ];
 }
 else{
     $response=["status"=>0,"message"=>"Invalid username or password"];

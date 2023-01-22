@@ -83,12 +83,21 @@ if(isset($_POST["ID"]) && isset($_POST["pay"]) && isset($_POST["amount"]) && iss
   $ID = $_POST["ID"];
   $amount = $_POST["amount"];
   $payable = $_POST["pay"];
+  $company_id = $_SESSION["company_id"];
 
+  $company_account = DBHelper::get("SELECT * FROM `company_account` WHERE id = $company_id");
+  $balance = $company_account->fetch_assoc()["amount"];
+
+  if($balance < $amount){
+    showMessage("Company does not have enough balance to perform this transcation",false);
+    exit;
+  }
+ else{
   if($amount <= $payable){
    if(DBHelper::set("UPDATE application_investor_pending_payment set payable = payable - {$amount}, paid = paid + {$amount} WHERE id = {$ID} and company_id = '{$_SESSION["company_id"]}'"))
    {
     DBHelper::set("UPDATE `investor_account` set `balance`= balance + {$amount} WHERE investorID = {$investID}");
-    DBHelper::set("UPDATE company_account set amount = amount - {$amount}");
+    DBHelper::set("UPDATE company_account set amount = amount - {$amount} where id = $company_id");
     ?>
     <script>
         var ID = "<?php echo $investID;?>"
@@ -103,6 +112,7 @@ if(isset($_POST["ID"]) && isset($_POST["pay"]) && isset($_POST["amount"]) && iss
 }
 else{
       showMessage("Amount should not be greater then payable amount",false);
+}
 }
 
 }

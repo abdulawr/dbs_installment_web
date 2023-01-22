@@ -94,13 +94,9 @@ if (isset($_POST["addInverstor"])) {
   $fileType = explode("/",$file["type"])[1];
   $filename=RandomString(50).".".$fileType;
   
-  $check = DBHelper::get("SELECT id,cnic,company_id FROM `investor` WHERE cnic = '{$cnic}'");
-
+  $check = DBHelper::get("SELECT id FROM `investor` WHERE cnic = '{$cnic}' and company_id = '{$_SESSION["company_id"]}'");
   if($check->num_rows > 0){
-     $investor = $check->fetch_assoc();
-     $check = DBHelper::get("SELECT name FROM `company_info` WHERE id = '{$investor["company_id"]}'");
-     $investor_name = $check->fetch_assoc()["name"];
-     showMessage("Investor with CNIC: ".$cnic." already register in ".$investor_name." company with ID: ".$customer["id"],false);
+   showMessage("Account already exist with this CNIC",false);
   }
   else{
     if(move_uploaded_file($file["tmp_name"],"../images/investor/".$filename)){

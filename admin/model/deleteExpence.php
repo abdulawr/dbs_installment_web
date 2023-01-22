@@ -16,13 +16,13 @@ $company_id = $_SESSION["company_id"];
 if($adminType["type"] == '1'){
   if($expRec["status"] == '0'){
       // dbs company
-      DBHelper::set("UPDATE company_account SET amount = amount + {$amount}");
+      DBHelper::set("UPDATE company_account SET amount = amount + {$amount} where company_id = $company_id");
       DBHelper::set("DELETE FROM `admin_transaction` WHERE `date` = '{$expRec["date"]}' and `adminID` = {$expRec["adminID"]} and `exp_type` = 0 and `type` = 'expence';");
       DBHelper::set("DELETE FROM `company_expense` WHERE `id` = {$ID}");
   }
   else{
       // dbs shop
-      DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$amount} WHERE `status` = 0 and id = 1");
+      DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$amount} WHERE `status` = 0 and id = 1 and company_id = $company_id");
       DBHelper::set("DELETE FROM `admin_transaction` WHERE `date` = '{$expRec["date"]}' and `adminID` = {$expRec["adminID"]} and `exp_type` = 1 and `type` = 'expence';");
       DBHelper::set("DELETE FROM `company_expense` WHERE `id` = {$ID}");
   }

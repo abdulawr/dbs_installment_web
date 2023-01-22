@@ -11,14 +11,20 @@ if(!isset($_POST["adminID"])){
   exit;
 }
 
-if(!isset($_POST["api_key"])){
+if(!isset($_REQUEST["api_key"])){
   echo json_encode(["status"=>0,"message"=>"Unauthorized access!"]);
+  exit;
+}
+
+if(!isset($_REQUEST["company_id"])){
+  echo json_encode(["status"=>0,"message"=>"Access without company details is not allowed!"]);
   exit;
 }
 
 $type = validateInput($_POST["type"]);
 $adminID = validateInput($_POST["adminID"]);
-$apk_key = $_POST["api_key"];
+$apk_key = $_REQUEST["api_key"];
+$company_id = $_REQUEST["company_id"];
 
 
 if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
@@ -206,30 +212,30 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
  // --------------------- Get Home Page Data start --------------------------
  elseif(trim($type) == "getHomeScreenData"){
    $response=[];
-    $cmp = DBHelper::get("SELECT * FROM `company_info`")->fetch_assoc();
+    $cmp = DBHelper::get("SELECT * FROM `company_info` where id = $company_id")->fetch_assoc();
     $response["companyinfo"] = $cmp;
 
-    $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$adminID}");
+    $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$adminID} and company_id = $company_id");
     $amount = ($access_pending_amount->num_rows > 0) ? $access_pending_amount->fetch_assoc()["total"] : "0";
-    $adminAmount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID}")->fetch_assoc()["amount"];
+    $adminAmount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID} and company_id = $company_id")->fetch_assoc()["amount"];
 
     $amount += $adminAmount;
     $response["adminBalance"] = $amount;
 
     //DBS Company
-    $account = DBHelper::get("SELECT * FROM `company_account` ")->fetch_assoc();
-    $pending_account = DBHelper::get("SELECT SUM(amount) as 'sum' from admin_account")->fetch_assoc();
+    $account = DBHelper::get("SELECT * FROM `company_account` where id = $company_id")->fetch_assoc();
+    $pending_account = DBHelper::get("SELECT SUM(amount) as 'sum' from admin_account where company_id = $company_id")->fetch_assoc();
 
     $response["dbs_cmp_balance"] = $account["amount"];
     $response["dbs_cmp_pending"] = $pending_account["sum"];
 
-    $pendingPayment = DBHelper::get("SELECT SUM(payable) as tot from application_investor_pending_payment WHERE `payable` > 0;");
+    $pendingPayment = DBHelper::get("SELECT SUM(payable) as tot from application_investor_pending_payment WHERE `payable` > 0 and company_id = $company_id;");
     $response["investor_pending"] = $pendingPayment->fetch_assoc()["tot"];
 
-    $customerPayment = DBHelper::get("SELECT id,`total_price` FROM application WHERE status = 3;");
+    $customerPayment = DBHelper::get("SELECT id,`total_price` FROM application WHERE status = 3 and company_id = $company_id;");
     $totalPPCUS = 0;
      while($row = $customerPayment->fetch_assoc()){
-      $pp = DBHelper::get("SELECT SUM(amount) as tot from application_installment WHERE appID = {$row["id"]};");
+      $pp = DBHelper::get("SELECT SUM(amount) as tot from application_installment WHERE appID = {$row["id"]} and company_id = $company_id;");
       if($pp->num_rows > 0){
         $pps = (int) $pp->fetch_assoc()["tot"];
         $totalPPCUS += ceil(abs((int) $row["total_price"] - $pps));
@@ -244,8 +250,8 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
      $response["avail_balance"] =  $available = abs($account["amount"] - $totalPPCUS);;
 
     // DBS Shop
-    $dbs_account = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 0")->fetch_assoc();
-    $dbs_stock = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 1")->fetch_assoc();
+    $dbs_account = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 0 and company_id = $company_id")->fetch_assoc();
+    $dbs_stock = DBHelper::get("SELECT * FROM `dbs_shop_account` WHERE `status` = 1 and company_id = $company_id")->fetch_assoc();
     $response["dbs_shop_balance"] = $dbs_account["balance"];
     $response["dbs_shop_stock"] = $dbs_stock["balance"];
 

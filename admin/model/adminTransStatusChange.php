@@ -14,6 +14,22 @@ if(isset($_GET["ID"]) && isset($_GET["adminID"])){
  $tran_data = DBHelper::get("SELECT * FROM `admin_transaction` WHERE id = {$tranID} and adminID = {$adminID}");
  $adminAccount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID} and company_id = $company_id")->fetch_assoc();
  $adminAccount = $adminAccount["amount"];
+
+ $company_account = DBHelper::get("SELECT * FROM `company_account` WHERE id = $company_id");
+ $balance = $company_account->fetch_assoc()["amount"];
+
+ if($balance <  $adminAccount &&
+  (($tran_data["status"] == 1) ||
+   ($tran_data["exp_type"] == 0 && $tran_data["type"] == "expence"))){
+   ?>
+   <script>
+       var id = "<?php echo $_GET["adminID"];?>";
+       alert("Company does not have enough balance to perform this transcation");
+       location.replace("../adminProfile?ID="+id);
+   </script>
+   <?php
+   exit;
+ }
  
  if($adminAccount > 0) {
  if($tran_data->num_rows > 0){
