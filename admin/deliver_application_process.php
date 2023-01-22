@@ -68,9 +68,10 @@ if(DBHelper::set($pending_payment_query)){
     if(DBHelper::set("UPDATE investor_account SET balance = balance - {$app["product_orginal_price"]} where investorID = {$invesID} and company_id = '{$_SESSION["company_id"]}'")){
       $adminID = $_SESSION["isAdmin"];
       $adminType = $_SESSION["type"];
-      $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID}");
+
+      $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = '{$_SESSION["company_id"]}'");
       if($check_admin_account->num_rows <= 0){
-       DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`) VALUES (0,{$adminID})");
+          DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES (0,{$adminID},'{$_SESSION["company_id"]}')");
       }
 
       if($adminType == 2){

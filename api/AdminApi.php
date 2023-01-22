@@ -84,7 +84,7 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
 
  // --------------------- Get company information start --------------------------
   elseif(trim($type) == "getCompanyInfo"){
-    $data = DBHelper::get("SELECT * FROM `company_info`");
+    $data = DBHelper::get("SELECT * FROM `company_info` where id = $company_id");
     if($data->num_rows > 0){
         echo json_encode(["status"=>1,"message"=>"Successfull","data"=>$data->fetch_assoc()]);
     }
@@ -111,7 +111,7 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
                  email = '{$email}',
                  address = '{$address}',
                  facebook = '{$facebook}',
-                 whatsapp = '{$whatapp}' ;"; 
+                 whatsapp = '{$whatapp}' where id = $company_id ;"; 
         if(DBHelper::set($qry)){
             echo json_encode(["status"=>1,"message"=>"Company info updated successfully"]);
         }
@@ -137,13 +137,15 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
     $image = base64_decode($image);
     if(file_put_contents("../images/customer/".$filename,$image)){
        $qry = "INSERT INTO customer 
-       (name,cnic,mobile,address,image,fname) VALUES(
+       (name,cnic,mobile,address,image,fname,company_id) VALUES(
        '{$name}',
        '{$cnic}',
        '{$mobile}',
        '{$address}',
        '{$filename}',
-       '{$father}')";
+       '{$father}',
+       '{$company_id}'
+       )";
 
        if(DBHelper::set($qry)){
         $response = ["status"=>1,"message"=>"Customer account created successfully"];
@@ -180,12 +182,14 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
     $image = base64_decode($image);
     if(file_put_contents("../images/investor/".$filename,$image)){
        $qry = "INSERT INTO investor 
-       (name,cnic,mobile,address,image) VALUES(
+       (name,cnic,mobile,address,image,company_id) VALUES(
        '{$name}',
        '{$cnic}',
        '{$mobile}',
        '{$address}',
-       '{$filename}')";
+       '{$filename}',
+       '{$company_id}'
+       )";
 
        if(DBHelper::set($qry)){
         $response = ["status"=>1,"message"=>"Investor account created successfully"];
@@ -217,7 +221,12 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
 
     $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$adminID} and company_id = $company_id");
     $amount = ($access_pending_amount->num_rows > 0) ? $access_pending_amount->fetch_assoc()["total"] : "0";
-    $adminAmount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID} and company_id = $company_id")->fetch_assoc()["amount"];
+    $adminAmount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID} and company_id = $company_id");
+    if($adminAmount->num_rows > 0){
+      $adminAmount = $adminAmount->fetch_assoc()["amount"];
+    }else{
+      $adminAmount = 0;
+    }
 
     $amount += $adminAmount;
     $response["adminBalance"] = $amount;
@@ -255,6 +264,13 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
     $response["dbs_shop_balance"] = $dbs_account["balance"];
     $response["dbs_shop_stock"] = $dbs_stock["balance"];
 
+    $companies_list = DBHelper::get("SELECT id,name FROM `company_info` order by id asc;");
+    $cmps = [];
+    while($row = $companies_list->fetch_assoc()){
+      array_push($cmps,$row);
+    }
+    $response["companies_list"] = $cmps;
+
    echo json_encode($response);
  }
  // --------------------- Get Home Page Data End --------------------------
@@ -264,9 +280,15 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
  // --------------------- Get admin list start --------------------------
  elseif(trim($type) == "getAdminList"){
    $response = [];
-   $data = DBHelper::get("SELECT admin.*,amount FROM admin left JOIN admin_account on adminID = admin.id;");
+   $data = DBHelper::get("SELECT * FROM admin");
    while($row = $data->fetch_assoc()){
-    $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$row["id"]}");
+
+    $id = $row["id"];
+    $balance = DBHelper::get("SELECT * FROM `admin_account` WHERE adminID = {$id} and company_id = $company_id");
+    $balance = ($balance->num_rows > 0) ? $balance->fetch_assoc()["amount"] : "0";
+    $row["amount"] = $balance;
+
+    $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$row["id"]} and company_id = $company_id");
     $amount = ($access_pending_amount->num_rows > 0) ? $access_pending_amount->fetch_assoc()["total"] : "0";
     $row["accessBalance"] = $amount;
     array_push($response,$row);
@@ -296,7 +318,7 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
 
   // --------------------- Get Admin Pending Transaction start --------------------------
   elseif(trim($type) == "getAdminPendingTransaction"){
-    $data = DBHelper::get("SELECT * from admin_transaction WHERE 
+    $data = DBHelper::get("SELECT * from admin_transaction WHERE company_id = $company_id and
     adminID = {$adminID} and paymentStatus = 0 order by id desc");
     $response = [];
     while($row = $data->fetch_assoc()){
@@ -313,8 +335,8 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
    $tranID = $_POST["ID"];
    $adminID = $_POST["ADMID"];
    
-    $tran_data = DBHelper::get("SELECT * FROM `admin_transaction` WHERE id = {$tranID} and adminID = {$adminID}");
-  $adminAccount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID}")->fetch_assoc();
+    $tran_data = DBHelper::get("SELECT * FROM `admin_transaction` WHERE id = {$tranID} and adminID = {$adminID} and company_id = $company_id");
+  $adminAccount = DBHelper::get("SELECT amount FROM `admin_account` WHERE `adminID` = {$adminID} and company_id = $company_id")->fetch_assoc();
   $adminAccount = $adminAccount["amount"];
 
     if($adminAccount > 0){
@@ -325,15 +347,15 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
    
     if($tran_data["type"] == "investor"){
        if($tran_data["status"] == 0){
-           DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-           DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
-           DBHelper::set("UPDATE company_account SET amount = amount + {$amount};");
+           DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+           DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
+           DBHelper::set("UPDATE company_account SET amount = amount + {$amount} where id = $company_id;");
            $check = true;
        }
        elseif($tran_data["status"] == 1){
-           DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-           DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
-           DBHelper::set("UPDATE company_account SET amount = amount - {$amount};");
+           DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+           DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
+           DBHelper::set("UPDATE company_account SET amount = amount - {$amount} where id = $company_id;");
            $check = true;
        }
        else{
@@ -343,27 +365,27 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
     }
    
     elseif($tran_data["type"] == "dbs_shop"){
-       DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-       DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
-       DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$amount} where status = 0");
+       DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+       DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
+       DBHelper::set("UPDATE dbs_shop_account SET balance = balance + {$amount} where status = 0 and company_id = $company_id");
        $check = true;
     }
    
     elseif($tran_data["type"] == "customer"){
-       DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-       DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
-       DBHelper::set("UPDATE company_account SET amount = amount + {$amount};");
+       DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+       DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
+       DBHelper::set("UPDATE company_account SET amount = amount + {$amount} where id = $company_id;");
        $check = true;
     }
     elseif($tran_data["type"] == "expence"){
-      DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]}");
-      DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID}");
+      DBHelper::set("UPDATE admin_transaction SET paymentStatus = 1 WHERE id = {$tran_data["id"]} and company_id = $company_id");
+      DBHelper::set("UPDATE admin_account SET amount = amount - {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
     
       if($tran_data["exp_type"] == 0){
-         DBHelper::set("UPDATE company_account SET amount = amount - {$amount};");
+         DBHelper::set("UPDATE company_account SET amount = amount - {$amount} where id = $company_id;");
       }
       else{
-         DBHelper::set("UPDATE dbs_shop_account SET balance = balance - {$amount} WHERE status = 0");
+         DBHelper::set("UPDATE dbs_shop_account SET balance = balance - {$amount} WHERE status = 0 and company_id = $company_id");
       }
    
       $check = true;
@@ -403,7 +425,7 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
     $type = 1;
    }
 
-   $data = DBHelper::get("SELECT * FROM `accessories_account` WHERE status = 0 and type = {$type} and sellID = {$adminID}");
+   $data = DBHelper::get("SELECT * FROM `accessories_account` WHERE status = 0 and type = {$type} and sellID = {$adminID} and company_id = $company_id");
    while($row = $data->fetch_assoc()){
      array_push($response,$row);
    }
@@ -418,14 +440,14 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
 elseif(trim($type) == "changePending_Accessory_TransactionType"){
 $userID = DBHelper::escape($_POST["ADMID"]);
 $hisID = DBHelper::escape($_POST["ID"]);
-$balance = DBHelper::get("SELECT amount,type FROM accessories_account WHERE id = {$hisID} and sellID = {$userID}")->fetch_assoc();
+$balance = DBHelper::get("SELECT amount,type FROM accessories_account WHERE id = {$hisID} and sellID = {$userID} and company_id = $company_id")->fetch_assoc();
 $price = $balance["amount"];
 $page = (trim($balance["type"]) == "0") ? "ShopkeeperProfile" : "adminProfile";
 $page .= "?ID=".$userID;
 
-if(DBHelper::set("UPDATE accessories_account SET status = 1 WHERE id = {$hisID} and sellID = {$userID}")){
-    DBHelper::set("UPDATE dbs_shop_account set balance=balance + {$price} where status = 0");
-    DBHelper::set("UPDATE dbs_shop_account set balance=balance - {$price} where status = 1");
+if(DBHelper::set("UPDATE accessories_account SET status = 1 WHERE id = {$hisID} and sellID = {$userID} and company_id = $company_id")){
+    DBHelper::set("UPDATE dbs_shop_account set balance=balance + {$price} where status = 0 and company_id = $company_id");
+    DBHelper::set("UPDATE dbs_shop_account set balance=balance - {$price} where status = 1 and company_id = $company_id");
     echo json_encode(["status"=>1,"message"=>"Action perform successuflly"]); 
 }
 else{
@@ -442,7 +464,7 @@ else{
    $response = [];
    $data = DBHelper::get("SELECT * FROM `shopkeeper`");
    while($row = $data->fetch_assoc()){
-    $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 0 and sellID = {$row["id"]}");
+    $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 0 and sellID = {$row["id"]} and company_id = $company_id");
     $access_pending_amount = $access_pending_amount->fetch_assoc()["total"];
     $amount = (!empty($access_pending_amount)) ? $access_pending_amount : "0";
     $row["balance"] = $amount;
@@ -459,7 +481,7 @@ else{
   $response = [];
   $status = validateInput($_POST["status"]);
   $ID = validateInput($_POST["ID"]);
-  if(DBHelper::set("UPDATE shopkeeper SET status = {$status} WHERE id = {$ID}")){
+  if(DBHelper::set("UPDATE shopkeeper SET status = {$status} WHERE id = {$ID} and company_id = $company_id")){
    $response = ["status"=>1,"message"=>"Account status changed successfuly","st"=>$status];
   }
  else{
@@ -472,21 +494,20 @@ else{
 
 
 
-
   // --------------------- Change shopkeeper transaction type start --------------------------
 elseif(trim($type) == "Change_shopkeeper_PendingBalance"){
     $hisID = $_POST["ID"];
     $userID = $_POST["ADMID"];
 $response = [];
 
-$balance = DBHelper::get("SELECT amount,type FROM accessories_account WHERE id = {$hisID} and sellID = {$userID}")->fetch_assoc();
+$balance = DBHelper::get("SELECT amount,type FROM accessories_account WHERE id = {$hisID} and sellID = {$userID} and company_id = $company_id")->fetch_assoc();
 $price = $balance["amount"];
 $page = (trim($balance["type"]) == "0") ? "ShopkeeperProfile" : "adminProfile";
 $page .= "?ID=".$userID;
 
-if(DBHelper::set("UPDATE accessories_account SET status = 1 WHERE id = {$hisID} and sellID = {$userID}")){
-    DBHelper::set("UPDATE dbs_shop_account set balance=balance + {$price} where status = 0");
-    DBHelper::set("UPDATE dbs_shop_account set balance=balance - {$price} where status = 1");
+if(DBHelper::set("UPDATE accessories_account SET status = 1 WHERE id = {$hisID} and sellID = {$userID} and company_id = $company_id")){
+    DBHelper::set("UPDATE dbs_shop_account set balance=balance + {$price} where status = 0 and company_id = $company_id");
+    DBHelper::set("UPDATE dbs_shop_account set balance=balance - {$price} where status = 1 and company_id = $company_id");
     $response = ["status"=>1,"message"=>"Action perform successuflly"];
 }
 else{
@@ -519,7 +540,7 @@ echo json_encode($response);
    $data=DBHelper::get("SELECT customer.id AS 'cusID',customer.name,customer.mobile,companies.name 
    as 'comp',item_type.name as 'item',application.* from application INNER JOIN 
    customer on customer.id = cusID INNER JOIN companies on companies.id = companyID 
-   INNER JOIN item_type on item_type.id = item_type_id where {$search};");
+   INNER JOIN item_type on item_type.id = item_type_id where {$search} and application.company_id = $company_id;");
    while($row = $data->fetch_assoc()){
      array_push($response,$row);
    }
@@ -536,10 +557,10 @@ $discount_amount = $_POST["amount"];
 $investor_amount = ceil($discount_amount / 100) * 75;
 $company_amount = ceil($discount_amount / 100) * 25;
 
-$details = DBHelper::get("SELECT * FROM `application` WHERE id = {$appID}")->fetch_assoc();
-if(DBHelper::set("UPDATE application set `total_price`= total_price - {$discount_amount},discount_amount={$discount_amount} WHERE id = {$appID}")){
- DBHelper::set("UPDATE `company_account` SET `amount`= amount - {$company_amount}");
- DBHelper::set("UPDATE investor_account SET balance = balance - {$investor_amount} WHERE investorID = {$details["investorID"]}");
+$details = DBHelper::get("SELECT * FROM `application` WHERE id = {$appID} and company_id = $company_id")->fetch_assoc();
+if(DBHelper::set("UPDATE application set `total_price`= total_price - {$discount_amount},discount_amount={$discount_amount} WHERE id = {$appID} and company_id = $company_id")){
+ DBHelper::set("UPDATE `company_account` SET `amount`= amount - {$company_amount} where id = $company_id");
+ DBHelper::set("UPDATE investor_account SET balance = balance - {$investor_amount} WHERE investorID = {$details["investorID"]} and company_id = $company_id");
 
  echo json_encode(["status"=>1,"message"=>"Action perform successfully"]);
 }
@@ -556,16 +577,16 @@ else{
  elseif(trim($type) == "getApplicationDetails_View"){
    $appID = validateInput($_POST["appID"]);
    $response = [];
-   $application = DBHelper::get("SELECT * FROM application WHERE id = {$appID}")->fetch_assoc();
-   $customer = DBHelper::get("SELECT * FROM `customer` WHERE id = {$application['cusID']}")->fetch_assoc();
+   $application = DBHelper::get("SELECT * FROM application WHERE id = {$appID} and company_id = $company_id")->fetch_assoc();
+   $customer = DBHelper::get("SELECT * FROM `customer` WHERE id = {$application['cusID']} and company_id = $company_id")->fetch_assoc();
    $response["customer"] = $customer;
 
    if($application["status"] == '3' || $application["status"] == '4'){
-    $investor = DBHelper::get("SELECT * FROM `investor` WHERE id = {$application['investorID']}")->fetch_assoc();
+    $investor = DBHelper::get("SELECT * FROM `investor` WHERE id = {$application['investorID']} and company_id = $company_id")->fetch_assoc();
     $response["investor"] = $investor; 
 
     $trans = [];
-    $Trandata = DBHelper::get("SELECT * FROM `application_installment` WHERE appID = {$application["id"]}");
+    $Trandata = DBHelper::get("SELECT * FROM `application_installment` WHERE appID = {$application["id"]} and company_id = $company_id");
     while($row = $Trandata->fetch_assoc()){
       array_push($trans,$row);
     }
@@ -578,11 +599,11 @@ else{
 
   $installment = DBHelper::get("SELECT  (
     SELECT COUNT(id)
-    FROM   application_installment WHERE appID = {$application["id"]}
+    FROM   application_installment WHERE appID = {$application["id"]} and company_id = $company_id
 ) AS count,
 (
     SELECT sum(amount)
-    FROM   application_installment WHERE appID = {$application["id"]}
+    FROM   application_installment WHERE appID = {$application["id"]} and company_id = $company_id
 ) AS total")->fetch_assoc();
 
   $response["total_paid_amount"] = $installment["total"];
@@ -603,20 +624,20 @@ else{
    $adminID = $adminID;
    $date = date("Y-m-d");
   
-   $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID}");
+   $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = $company_id");
    if($check_admin_account->num_rows <= 0){
-    DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`) VALUES (0,{$adminID})");
+    DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES (0,{$adminID},$company_id)");
    }
  
-   if(DBHelper::set("INSERT INTO `application_installment`(`appID`, `date`, `amount`, `type`) VALUES ($appID,'{$date}',$amount,'I')")){
+   if(DBHelper::set("INSERT INTO `application_installment`(`appID`, `date`, `amount`, `type`,company_id) VALUES ($appID,'{$date}',$amount,'I',$company_id)")){
      if($adminType == 2){
-         DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID}");
+         DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
        }
        else{
-         DBHelper::set("UPDATE company_account set amount=amount+ {$amount}");
+         DBHelper::set("UPDATE company_account set amount=amount+ {$amount} where id = $company_id");
        }
      
-       DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID) VALUES ($amount,'{$date}',2,'customer',$adminID,$appID)");
+       DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID,company_id) VALUES ($amount,'{$date}',2,'customer',$adminID,$appID,$company_id)");
      
        echo json_encode(["status"=>1,"message"=>"Monthly installment is successfully added"]);
    }
@@ -633,7 +654,7 @@ else{
   // --------------------- Complete Application start --------------------------
   elseif(trim($type) == "addApplicationInstallement"){
     $appID = validateInput($_POST["appID"]);
-    if(DBHelper::set("UPDATE application SET status = 4 WHERE id = {$appID}")){
+    if(DBHelper::set("UPDATE application SET status = 4 WHERE id = {$appID} and company_id = $company_id")){
       echo json_encode(["status"=>1,"message"=>"Application complete successfully"]);
     }
     else{
@@ -665,7 +686,7 @@ else{
    $ID = validateInput($_POST["appID"]);
    $des = validateInput($_POST["comment"]);
 
-if(DBHelper::set("UPDATE application SET status = 5,rej_des='{$des}' WHERE id = {$ID}")){
+if(DBHelper::set("UPDATE application SET status = 5,rej_des='{$des}' WHERE id = {$ID} and company_id = $company_id")){
   echo json_encode(["status"=>1,"message"=>"Application rejected successfully"]);
 }
 else{
@@ -680,7 +701,7 @@ else{
   elseif(trim($type) == "acceptApplicationWithadvance"){
     $ID = DBHelper::escape($_POST["appID"]);
     $amount = $_POST['amount'];
-    $app = DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
+    $app = DBHelper::get("select * from application where id = {$ID} and company_id = $company_id")->fetch_assoc();
     $date = date('Y-m-d');
     if($app["advance_payment"] == $amount){
     $advanceStatus = 1;
@@ -688,7 +709,7 @@ else{
     else{
         $advanceStatus = 0;
     }
-    if(DBHelper::set("UPDATE application SET status = 1,advance_payment_status={$advanceStatus},advance_payment_paid={$amount},active_date='{$date}' WHERE id = {$ID}")){
+    if(DBHelper::set("UPDATE application SET status = 1,advance_payment_status={$advanceStatus},advance_payment_paid={$amount},active_date='{$date}' WHERE id = {$ID} and company_id = $company_id")){
       echo json_encode(["status"=>1,"message"=>"Action performed successfully!"]);
     }
     else{
@@ -703,7 +724,7 @@ else{
   // --------------------- Get admin profile start --------------------------
   elseif(trim($type) == "FullyPaidAdvancePayment"){
     $ID = DBHelper::escape($_POST["appID"]);
-    $app = DBHelper::get("select * from application where id = {$ID}")->fetch_assoc();
+    $app = DBHelper::get("select * from application where id = {$ID} and company_id = $company_id")->fetch_assoc();
 
     if(DBHelper::set("UPDATE application SET advance_payment_status=1,advance_payment_paid={$app["advance_payment"]} WHERE id = {$ID}")){
       echo json_encode(["status"=>1,"message"=>"Action perform successfully"]);
@@ -719,8 +740,8 @@ else{
  // --------------------- Get investor list for deliver application start --------------------------
  elseif(trim($type) == "getDeliverApplicationInvestorLIst"){
   $id = validateInput($_POST["appID"]);
-  $app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$id}")->fetch_assoc();
-  $investorList = DBHelper::get("SELECT investor.*,investor_account.balance FROM investor INNER JOIN investor_account on investorID = investor.id WHERE balance >= {$app["product_orginal_price"]};");
+  $app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$id} and application.company_id = $company_id")->fetch_assoc();
+  $investorList = DBHelper::get("SELECT investor.*,investor_account.balance FROM investor INNER JOIN investor_account on investorID = investor.id WHERE balance >= {$app["product_orginal_price"]} and investor.company_id = $company_id;");
   $response = [];
   while($row = $investorList->fetch_assoc()) {
     array_push($response,$row);
@@ -737,9 +758,9 @@ else{
    $appID = validateInput($_POST["appID"]);
    $invesID = validateInput($_POST["investorID"]);
 
-   $app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$appID}")->fetch_assoc();
-   $customer = DBHelper::get("SELECT * FROM `customer` WHERE id = {$app["cusID"]}")->fetch_assoc();
-   $investor = DBHelper::get("SELECT * FROM `investor` WHERE id = {$invesID}")->fetch_assoc();
+   $app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$appID} and application.company_id = $company_id")->fetch_assoc();
+   $customer = DBHelper::get("SELECT * FROM `customer` WHERE id = {$app["cusID"]} and company_id = $company_id")->fetch_assoc();
+   $investor = DBHelper::get("SELECT * FROM `investor` WHERE id = {$invesID} and company_id = $company_id")->fetch_assoc();
 
    $profit = ($app["product_orginal_price"] / 100) * $app["percentage_on_prod"];
    $profit = ceil($profit);
@@ -750,14 +771,14 @@ else{
    $investor_total = $app["product_orginal_price"] + $investor_prof;
 
    $pending_payment_query = "INSERT INTO `application_investor_pending_payment`
-       (`invest_amount`, `appID`, `investorID`, `cusID`, `date`,`profit`, `total_amount`,payable)
+       (`invest_amount`, `appID`, `investorID`, `cusID`, `date`,`profit`, `total_amount`,payable,company_id)
        VALUES ({$app["product_orginal_price"]},
               {$appID},
               {$invesID},
               {$app["cusID"]},
               '{$date}',
               {$investor_prof},
-              {$investor_total}, {$investor_total});";
+              {$investor_total}, {$investor_total},$company_id);";
 
 $state = false;
 if (DBHelper::set($pending_payment_query)) {
@@ -767,48 +788,48 @@ if (DBHelper::set($pending_payment_query)) {
     $image = base64_decode($image);
     file_put_contents("../images/application/".$fileName, $image);
   
-    if (DBHelper::set("UPDATE application set status = 3,investorID=$invesID, delivery_image='{$fileName}' WHERE id = {$appID}")) {
-        if (DBHelper::set("INSERT INTO `application_installment`(`appID`, `date`, `amount`, `type`) VALUES ({$appID},'{$date}',{$app["advance_payment"]},'A')")) {
+    if (DBHelper::set("UPDATE application set status = 3,investorID=$invesID, delivery_image='{$fileName}' WHERE id = {$appID} and company_id = $company_id")) {
+        if (DBHelper::set("INSERT INTO `application_installment`(`appID`, `date`, `amount`, `type`,company_id) VALUES ({$appID},'{$date}',{$app["advance_payment"]},'A',$company_id)")) {
             $installment_id = $con->insert_id;
     
-            if (DBHelper::set("UPDATE investor_account SET balance = balance - {$app["product_orginal_price"]} where investorID = {$invesID}")) {
+            if (DBHelper::set("UPDATE investor_account SET balance = balance - {$app["product_orginal_price"]} where investorID = {$invesID} and company_id = $company_id")) {
                 $adminID = $adminID;
                 $adminType = $_POST["adminType"];
-                $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID}");
+                $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = $company_id");
                 if ($check_admin_account->num_rows <= 0) {
-                    DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`) VALUES (0,{$adminID})");
+                    DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES (0,{$adminID},$company_id)");
                 }
 
                 if ($adminType == 2) {
-                    DBHelper::set("UPDATE admin_account set amount = amount + {$app["advance_payment"]} WHERE adminID = {$adminID}");
+                    DBHelper::set("UPDATE admin_account set amount = amount + {$app["advance_payment"]} WHERE adminID = {$adminID} and company_id = $company_id");
                 } else {
-                    DBHelper::set("UPDATE company_account set amount=amount+ {$app["advance_payment"]}");
+                    DBHelper::set("UPDATE company_account set amount=amount+ {$app["advance_payment"]} where id = $company_id");
                 }
 
-                DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID) VALUES ({$app["advance_payment"]},'{$date}',2,'customer',$adminID,$appID)");
+                DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID,company_id) VALUES ({$app["advance_payment"]},'{$date}',2,'customer',$adminID,$appID,$company_id)");
      
                 echo json_encode(["status"=>1,"message"=>"Action perform successfully"]);
                 $state = true;
             } else {
                 $state = false;
-                DBHelper::set("DELETE FROM `application_investor_pending_payment` WHERE id = {$insert_id}");
+                DBHelper::set("DELETE FROM `application_investor_pending_payment` WHERE id = {$insert_id} and company_id = $company_id");
                 unlink("../images/application/".$fileName);
-                DBHelper::set("DELETE FROM `application_installment` WHERE id = {$installment_id}");
-                DBHelper::set("UPDATE application set status = 1 WHERE id = {$appID}");
+                DBHelper::set("DELETE FROM `application_installment` WHERE id = {$installment_id} and company_id = $company_id");
+                DBHelper::set("UPDATE application set status = 1 WHERE id = {$appID} and company_id = $company_id");
     
                 echo json_encode(["status"=>0,"message"=>"Something went in changing application status"]);
             }
         } else {
             $state = false;
-            DBHelper::set("DELETE FROM `application_investor_pending_payment` WHERE id = {$insert_id}");
+            DBHelper::set("DELETE FROM `application_investor_pending_payment` WHERE id = {$insert_id} and company_id = $company_id");
             unlink("../images/application/".$fileName);
-            DBHelper::set("UPDATE application set status = 1 WHERE id = {$appID}");
+            DBHelper::set("UPDATE application set status = 1 WHERE id = {$appID} and company_id = $company_id");
    
             echo json_encode(["status"=>0,"message"=>"Something went in changing application status"]);
         }
     } else {
         $state = false;
-        DBHelper::set("DELETE FROM `application_investor_pending_payment` WHERE id = {$insert_id}");
+        DBHelper::set("DELETE FROM `application_investor_pending_payment` WHERE id = {$insert_id} and company_id = $company_id");
         unlink("../images/application/".$fileName);
         echo json_encode(["status"=>0,"message"=>"Cannot perform the action righ now try again later or contact the developer"]);
     }
@@ -826,10 +847,10 @@ else{
  elseif(trim($type) == "getCustomer_and_Investor_List"){
    $status = validateInput($_POST["status"]);
    if($status == "1"){
-     $data = DBHelper::get("SELECT * FROM `customer`");
+     $data = DBHelper::get("SELECT * FROM `customer` where company_id = $company_id");
    }
    else{
-    $data = DBHelper::get("SELECT * FROM `investor`");
+    $data = DBHelper::get("SELECT * FROM `investor` where company_id = $company_id");
    }
 
    $response = [];
@@ -847,7 +868,7 @@ else{
   // --------------------- Getting investor balance start --------------------------
   elseif(trim($type) == "getInvestorBalance"){
     $invesID = validateInput($_POST["invID"]);
-    $data = DBHelper::get("SELECT `balance` FROM `investor_account` WHERE investorID = {$invesID}");
+    $data = DBHelper::get("SELECT `balance` FROM `investor_account` WHERE investorID = {$invesID} and company_id = $company_id");
     if($data->num_rows > 0){
       $data = $data->fetch_assoc();
       echo json_encode(["status"=>1,"message"=>"Successfully got balance","balance"=>$data["balance"]]);
@@ -870,30 +891,30 @@ else{
   $ID = $_POST["ID"];
   $des = $_POST["des"];
   
-  $check_investor_account = DBHelper::get("SELECT id FROM `investor_account` WHERE investorID = {$ID}");
+  $check_investor_account = DBHelper::get("SELECT id FROM `investor_account` WHERE investorID = {$ID} and company_id = $company_id");
   if($check_investor_account->num_rows <= 0){
-    DBHelper::set("INSERT INTO `investor_account`(`balance`, `investorID`) VALUES (0,{$ID})");
+    DBHelper::set("INSERT INTO `investor_account`(`balance`, `investorID`,company_id) VALUES (0,{$ID},$company_id)");
   }
 
-    $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID}");
+    $check_admin_account = DBHelper::get("SELECT id FROM `admin_account` WHERE adminID = {$adminID} and company_id = $company_id");
     if($check_admin_account->num_rows <= 0){
-     DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`) VALUES (0,{$adminID})");
+     DBHelper::set("INSERT INTO `admin_account`(`amount`, `adminID`,company_id) VALUES (0,{$adminID},$company_id)");
     }
 
 
   if($tranType == 0){
       // add balance
-      if(DBHelper::set("UPDATE investor_account SET balance = balance + {$amount} WHERE investorID = {$ID};")){
-        DBHelper::set("INSERT INTO `investor_transaction`(des,`amount`, `type`, `date`, `investorID`, `adminID`) VALUES ('{$des}',$amount,$tranType,'{$date}',$ID,$adminID)");
+      if(DBHelper::set("UPDATE investor_account SET balance = balance + {$amount} WHERE investorID = {$ID} and company_id = $company_id;")){
+        DBHelper::set("INSERT INTO `investor_transaction`(des,`amount`, `type`, `date`, `investorID`, `adminID`,company_id) VALUES ('{$des}',$amount,$tranType,'{$date}',$ID,$adminID,$company_id)");
         
         if($adminType == 2){
-          DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID}");
+          DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
         } 
         else{
-          DBHelper::set("UPDATE company_account set amount=amount+ {$amount}");
+          DBHelper::set("UPDATE company_account set amount=amount+ {$amount} where id = $company_id");
         }
 
-        DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`) VALUES ($amount,'{$date}',0,'investor',$adminID)");
+        DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,company_id) VALUES ($amount,'{$date}',0,'investor',$adminID,$company_id)");
         echo json_encode(["status"=>1,"message"=>"Payment added successfully"]);
      }
       else{
@@ -902,22 +923,22 @@ else{
   }
   elseif($tranType == 1){
       // subtrack balance
-      $investorBalance = DBHelper::get("SELECT balance FROM investor_account WHERE investorID = {$ID}")->fetch_assoc()["balance"];
+      $investorBalance = DBHelper::get("SELECT balance FROM investor_account WHERE investorID = {$ID} and company_id = $company_id")->fetch_assoc()["balance"];
       if($amount > $investorBalance){
         echo json_encode(["status"=>0,"message"=>"Subtract amount should not be greater then current balance try again"]);
         
       }
       else{
-        if(DBHelper::set("UPDATE investor_account SET balance = balance - {$amount} WHERE investorID = {$ID};")){
-            DBHelper::set("INSERT INTO `investor_transaction`(des,`amount`, `type`, `date`, `investorID`, `adminID`) VALUES ('{$des}',$amount,$tranType,'{$date}',$ID,$adminID)");
+        if(DBHelper::set("UPDATE investor_account SET balance = balance - {$amount} WHERE investorID = {$ID} and company_id = $company_id;")){
+            DBHelper::set("INSERT INTO `investor_transaction`(des,`amount`, `type`, `date`, `investorID`, `adminID`,company_id) VALUES ('{$des}',$amount,$tranType,'{$date}',$ID,$adminID,$company_id)");
             if($adminType == 2){
-                DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID}");
+                DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
             }
             else{
-              DBHelper::set("UPDATE company_account set amount=amount - {$amount}");
+              DBHelper::set("UPDATE company_account set amount=amount - {$amount} where id = $company_id");
             } 
 
-            DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`) VALUES ($amount,'{$date}',1,'investor',$adminID)");
+            DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,company_id) VALUES ($amount,'{$date}',1,'investor',$adminID,$company_id)");
             echo json_encode(["status"=>1,"message"=>"Payment subtracted successfully"]);
         }
         else{
@@ -934,7 +955,7 @@ else{
  elseif(trim($type) == "getinvestorUser"){
    $invesID = validateInput($_POST["ID"]);
    $response = [];
-   $data = DBHelper::get("SELECT customer.*,application.id as 'appID' from customer INNER JOIN application ON customer.id = cusID WHERE application.investorID = {$invesID};");
+   $data = DBHelper::get("SELECT customer.*,application.id as 'appID' from customer INNER JOIN application ON customer.id = cusID WHERE application.investorID = {$invesID} and application.company_id = $company_id;");
    while($row = $data->fetch_assoc()){
      array_push($response,$row);
    }
@@ -949,7 +970,7 @@ else{
   elseif(trim($type) == "getInvestorPendingBalance"){
     $invesID = validateInput($_POST["ID"]);
     $response = [];
-    $data = DBHelper::get("SELECT * FROM `application_investor_pending_payment` WHERE `investorID` = {$invesID} order by id desc;");
+    $data = DBHelper::get("SELECT * FROM `application_investor_pending_payment` WHERE `investorID` = {$invesID} and company_id = $company_id order by id desc;");
     while($row = $data->fetch_assoc()){
       array_push($response,$row);
     }
@@ -969,10 +990,10 @@ else{
     $payable = $_POST["pay"];
 
   if($amount <= $payable){
-   if(DBHelper::set("UPDATE application_investor_pending_payment set payable = payable - {$amount}, paid = paid + {$amount} WHERE id = {$ID}"))
+   if(DBHelper::set("UPDATE application_investor_pending_payment set payable = payable - {$amount}, paid = paid + {$amount} WHERE id = {$ID} and company_id = $company_id"))
    {
-    DBHelper::set("UPDATE `investor_account` set `balance`= balance + {$amount} WHERE investorID = {$investID}");
-    DBHelper::set("UPDATE company_account set amount = amount - {$amount}");
+    DBHelper::set("UPDATE `investor_account` set `balance`= balance + {$amount} WHERE investorID = {$investID} and company_id = $company_id");
+    DBHelper::set("UPDATE company_account set amount = amount - {$amount} where id = $company_id");
     echo json_encode(["status"=>1,"message"=>"Amount is added in customer account successfully"]);
   } else{
     echo json_encode(["status"=>0,"message"=>"Something went wrong try again"]);
@@ -1050,7 +1071,9 @@ total_price,
 installment_months,
 monthly_payment,
 advance_payment,
-ref_by) VALUES (
+ref_by,
+company_id
+) VALUES (
     '{$item_desp}',
    $cusID,
     $age,
@@ -1068,7 +1091,8 @@ ref_by) VALUES (
     $install_months,
     $monthly_payment,
     $advance_payment,
-    '{$ref_by}'
+    '{$ref_by}',
+    $company_id
 );";
 
 if(DBHelper::set($qry)){
@@ -1125,7 +1149,9 @@ if(DBHelper::set($qry)){
           `image`, 
           `cnic_image`, 
           `business_card_image`,
-          `appID`) VALUES (
+          `appID`,
+           company_id
+          ) VALUES (
               '{$fname}',
               '{$org_address}',
               '{$name}',
@@ -1136,7 +1162,8 @@ if(DBHelper::set($qry)){
               '{$Proof_Image_Name}',
               '{$Proof_CNIC_Image}',
               '{$Proof_Bus_Card}',
-               $app_ID
+               $app_ID,
+               $company_id
           )");
         }
  
