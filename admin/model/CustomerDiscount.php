@@ -1,4 +1,5 @@
 <?php
+session_start();
 include("../../include/conn.php");
 include("../../include/DBHelper.php");
 include("../../include/Encryption.php");

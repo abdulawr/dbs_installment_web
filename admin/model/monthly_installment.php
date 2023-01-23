@@ -25,7 +25,7 @@ if(isset($_POST["appID"]) && isset($_POST["amount"])){
         DBHelper::set("UPDATE admin_account set amount = amount + {$amount} WHERE adminID = {$adminID} and company_id = $company_id");
       }
       else{
-        DBHelper::set("UPDATE company_account set amount=amount+ {$amount} and id = $company_id");
+        DBHelper::set("UPDATE company_account set amount=amount+ {$amount} where id = $company_id");
       }
     
       DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID,company_id) VALUES ($amount,'{$date}',2,'customer',$adminID,$appID,$company_id)");
