@@ -1,12 +1,14 @@
 <?php include("include/header.php");
 
 $id = DBHelper::escape($_GET["ID"]);
-$investor = DBHelper::get("select * from customer where id = {$id} and company_id = '{$_SESSION["company_id"]}' ")->fetch_assoc();
+$company_id = (isset($_GET["type"]) && $_GET["type"] == 'search') ? "" : " and company_id = '{$_SESSION["company_id"]}' ";
+$company_withApp = (isset($_GET["type"]) && $_GET["type"] == 'search') ? "" : " and application.company_id = '{$_SESSION["company_id"]}' ";
+$investor = DBHelper::get("select * from customer where id = {$id} $company_id")->fetch_assoc();
 
 $customer=DBHelper::get("SELECT customer.id AS 'cusID',customer.name,customer.mobile,companies.name 
 as 'comp',item_type.name as 'item',application.* from application INNER JOIN 
 customer on customer.id = cusID INNER JOIN companies on companies.id = companyID 
-INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} and application.company_id = '{$_SESSION["company_id"]}' ");
+INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} $company_withApp");
 
 ?>
 
@@ -54,8 +56,9 @@ INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} and appl
                   </li>
                 </ul> -->
 
+                <?php if(!isset($_GET["type"])) { ?>
                 <a href="Customer_Application.php?ID=<?php echo $investor["id"];?>" class="btn btn-info btn-block"><b>New Application</b></a>
-              
+               <?php } ?>
             </div>
               <!-- /.card-body -->
             </div>
@@ -109,8 +112,9 @@ INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} and appl
               <div class="card-header p-2">
                 <ul class="nav nav-pills">
                   <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Application</a></li>
-                 
+                  <?php if(!isset($_GET["type"])) { ?>
                   <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Profile</a></li>
+                  <?php } ?>
                 </ul>
               </div><!-- /.card-header -->
               <div class="card-body">
@@ -180,8 +184,8 @@ INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} and appl
                         ?>
                         </td>
                         <td>
-                            <a href="View_Application?ID=<?php echo $row["id"];?>" class="btn-sm btn-info">Details</a>
-                         
+                        <?php $urlLink = (isset($_GET["type"]) && $_GET["type"] == "search") ? $row["id"]."&type=search" : $row["id"]; ?>
+                            <a href="View_Application?ID=<?php echo $urlLink;?>" class="btn-sm btn-info">Details</a>
                         </td>
                     </tr>
                         <?php
@@ -198,7 +202,7 @@ INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} and appl
                   <!-- /.tab-pane -->
 
                   <div class="tab-pane" id="settings">
-                    <form class="form-horizontal" method="post" enctype="multipart/form-data">
+                    <form class="form-horizontal" action="model/updateCustomerProfile.php" method="post" enctype="multipart/form-data">
                       <div class="form-group row">
                           <input name="id" type="hidden" value="<?php echo $investor["id"];?>">
                           <label for="inputName" class="col-sm-2 col-form-label">Name</label>
@@ -230,6 +234,7 @@ INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} and appl
                       </div>
 
                       <input type="file" class="mb-3" name="investorImage">
+                      <input type="hidden" value="<?php echo $investor["image"];?>" class="mb-3" name="cusImage">
   
                       <div class="form-group row">
                         <div class="offset-sm-0 col-sm-12">
@@ -300,36 +305,12 @@ INNER JOIN item_type on item_type.id = item_type_id where cusID = {$id} and appl
 </script>
 
 <?php
-if(isset($_POST["submit"])){
-    $name = $_POST["name"];
-    $cnic= $_POST["cnic"];
-    $mobile = $_POST["mobile"];
-    $address = $_POST["address"];
-    $id = $_POST["id"];
-
-    $file = $_FILES["investorImage"];
-
-    if(DBHelper::set("UPDATE `customer` SET `name`='{$name}',`cnic`='{$cnic}',`mobile`='{$mobile}',`address`='{$address}' WHERE id =$id and company_id = '{$_SESSION["company_id"]}' ")){
-     
-      if(!empty($file["name"]) && $file["size"] > 0){
-        $fileName = explode(".",$investor["image"])[0];
-        $ff = explode(".",$investor["image"])[0];
-        $ttps = explode(".",$investor["image"])[1];
-        $type=$file["type"];
-        $type=explode("/",$type)[1];
-        $fileName .=".".$type;
-
-        if(move_uploaded_file($file["tmp_name"],"../images/customer/".$fileName)){
-          DBHelper::set("UPDATE `customer` SET `image`='{$fileName}' where id = {$id} and company_id = '{$_SESSION["company_id"]}'");
-          if(trim($ttps) != trim($type)){
-            unlink("../images/customer/".$ff.".".$ttps);
-          }
-        }
-      }
-      showMessage("Customer account updated successfully",true);
+ if(isset($_GET['msg'])){
+    if($_GET["msg"] == "success"){
+       showMessage("Customer account updated successfully",true);
     }
     else{
         showMessage("Something went wrong in updating the customer",false);
     }
-}
+ }
 ?>

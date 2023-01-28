@@ -1,5 +1,5 @@
 <?php include("include/header.php") ;
-$comp= $_SESSION["company"];
+$comp = $_SESSION["company"];
 $id = DBHelper::escape($_GET["ID"]);
 $app = DBHelper::get("SELECT companies.name as 'comp',item_type.name as 'item',application.* from application INNER JOIN companies on companies.id = companyID INNER JOIN item_type on item_type.id = item_type_id WHERE application.id = {$id}")->fetch_assoc();
 $customer = DBHelper::get("SELECT * from customer WHERE id = {$app["cusID"]}")->fetch_assoc();
@@ -544,7 +544,7 @@ h3{
                           <td><span class="badge <?php echo ($row["type"] == 'A') ? "bg-success":"bg-warning"; ?>">
                           <?php echo ($row["type"] == 'A') ? "Advance payment":"Monthly payment"; ?></span></td>
                           <td>
-                            <?php if($app["status"] == '3' && $_SESSION["type"] == '1' && $row["type"] != 'A') {  ?>
+                            <?php if($app["status"] == '3' && $_SESSION["type"] == '1' && $row["type"] != 'A' && !isset($_GET["type"])) {  ?>
                             <a href="model/deleteInstallament.php?appID=<?php echo $app["id"]."&ID=".$row["id"];?>" class="btn btn-danger btn-sm">Delete</a>
                             <?php
                              } ?>
@@ -560,7 +560,7 @@ h3{
 
                 <a class="btn btn-outline-warning" href="print_installement?ID=<?php echo $app["id"];?>">Print Installment History</a>
 
-                <?php if(ceil($app["total_price"] - $installment["total"]) > 0) { ?>
+                <?php if(ceil($app["total_price"] - $installment["total"]) > 0 && !isset($_GET["type"])) { ?>
                 <div class="mt-3 mb-2 border border-success rounded">
                 <form method="post" class="form-inline p-3" action="model/CustomerDiscount">
                     <input type="hidden" name="appID" value="<?php echo $app["id"];?>">
@@ -673,7 +673,7 @@ h3{
           
          <div class="noprint mt-3 mb-3">
            <?php
-           if($app["status"] == 0 || $app["status"] == 1){
+           if(($app["status"] == 0 || $app["status"] == 1) && !isset($_GET["type"])){
              ?>
                <a href="model/deleteApplication?ID=<?php echo $app["id"];?>" class="btn btn-outline-danger">Delete Application</a>
              <?php
@@ -685,12 +685,12 @@ h3{
           
           <?php
            }
-           if($app["status"] == 0 && $_SESSION["type"] == '1'){
+           if($app["status"] == 0 && $_SESSION["type"] == '1' && !isset($_GET["type"])){
              ?>
                <button onclick="AcceptApplication()" class="btn btn-outline-warning ml-2">Accept application</button>
              <?php
            }
-           elseif($app["status"] == 1 && $app["advance_payment_status"] == '1'){
+           elseif($app["status"] == 1 && $app["advance_payment_status"] == '1' && !isset($_GET["type"])){
             ?>
               <a href="deliver_application?ID=<?php echo $app["id"]?>" class="btn btn-outline-warning ml-2">Deliver application</a>
             <?php
@@ -698,7 +698,7 @@ h3{
            ?>
 
            <?php
-           if($app["status"] == 0){
+           if($app["status"] == 0 && !isset($_GET["type"])){
             ?>
             <button onclick="RejectionAppp()"  class="btn btn-danger ml-2">Reject Applicationn</button>
           <?php
@@ -706,7 +706,7 @@ h3{
            ?>
 
            <?php
-           if($app["status"] == 3){
+           if($app["status"] == 3 && !isset($_GET["type"])){
              if($installment["total"] == $app["total_price"]){
                ?>
                 <a href="complete_application?ID=<?php echo $app["id"]?>" class="btn btn-warning ml-2">Complete application</a>
@@ -724,7 +724,7 @@ h3{
            ?>
 
          <?php
-           if($app["advance_payment_status"] == '0'){
+           if($app["advance_payment_status"] == '0' && !isset($_GET["type"])){
              ?>
                <a href="model/fullPaidAdvancePayment?ID=<?php echo $app["id"];?>" class="btn btn-outline-warning ml-2">Fully Paid Advance Payment</a>
              <?php

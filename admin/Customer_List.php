@@ -112,7 +112,9 @@ $customer=DBHelper::get("SELECT * FROM `customer` where company_id = '{$_SESSION
                         <td><?php echo $row["mobile"];?></td>
                         <td ><?php echo $row["address"];?></td>
                         <td>
-                            <a href="Customer_Profile.php?ID=<?php echo $row["id"];?>" class="btn btn-info btn-sm">View Details</a>
+                            <a href="Customer_Profile.php?ID=<?php echo $row["id"];?>" class="btn btn-info btn-sm">
+                            <i class="nav-icon fas fa-eye"></i>
+                          </a>
                         </td>
                     </tr>
                         <?php

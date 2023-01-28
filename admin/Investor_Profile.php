@@ -103,7 +103,7 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
 
                 <strong><i class="fas fa-map-marker-alt mr-1"></i> Address</strong>
 
-                <p class="text-muted urdu"><?php echo $investor["address"];?></p>
+                <p class="text-muted"><?php echo $investor["address"];?></p>
 
                 <hr>
 
@@ -380,7 +380,7 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
                   <!-- /.tab-pane -->
 
                   <div class="tab-pane" id="settings">
-                    <form class="form-horizontal" method="post" enctype="multipart/form-data">
+                    <form class="form-horizontal" action="model/updateInvestor.php" method="post" enctype="multipart/form-data">
                       <div class="form-group row">
                         
                       <label for="inputName" class="col-sm-2 col-form-label">Name</label>
@@ -412,6 +412,8 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
                       </div>
 
                       <input type="file" class="mb-3" name="investorImage">
+                      <input type="hidden" class="mb-3" name="ID" value="<?php echo $investor["id"]; ?>">
+                      <input type="hidden" class="mb-3" name="invImage" value="<?php echo $investor["image"]; ?>">
   
                       <div class="form-group row">
                         <div class="offset-sm-0 col-sm-12">
@@ -458,35 +460,14 @@ $balance = DBHelper::get("SELECT balance FROM `investor_account` WHERE investorI
 </script>
 
 <?php
-if(isset($_POST["submit"])){
-    $file = $_FILES["investorImage"];
-    $name = $_POST["name"];
-    $cnic= $_POST["cnic"];
-    $mobile = $_POST["mobile"];
-    $address = $_POST["address"];
-    $id = $investor["id"];
-
-    if(DBHelper::set("UPDATE `investor` SET `name`='{$name}',`cnic`='{$cnic}',`mobile`='{$mobile}',`address`='{$address}' WHERE id =$id and company_id = '{$_SESSION["company_id"]}'")){
-      if(!empty($file["name"]) && $file["size"] > 0){
-        $fileName = explode(".",$investor["image"])[0];
-        $type=$file["type"];
-        $ff = explode(".",$investor["image"])[0];
-        $ttps = explode(".",$investor["image"])[1];
-        $type=explode("/",$type)[1];
-        $fileName .=".".$type;
-        if(move_uploaded_file($file["tmp_name"],"../images/investor/".$fileName)){
-          DBHelper::set("UPDATE `investor` SET `image`='{$fileName}' where id = {$id} and company_id = '{$_SESSION["company_id"]}'s");
-          if(trim($ttps) != trim($type)){
-            unlink("../images/customer/".$ff.".".$ttps);
-          }
-        }
-      }
-      showMessage("Customer account updated successfully",true);
+ if(isset($_GET['msg'])){
+    if($_GET["msg"] == "success"){
+       showMessage("Investor account updated successfully",true);
     }
     else{
         showMessage("Something went wrong in updating the customer",false);
     }
-}
+ }
 ?>
 
 <script>

@@ -39,6 +39,15 @@
           </li>
           <?php } ?>
 
+          <li class="nav-item menu-open">
+            <a href="searchCustomer" class="nav-link">
+              <i class="nav-icon fas fa-search"></i>
+              <p>
+                Search Customer
+              </p>
+            </a>
+          </li>
+
 
 
          <!--  <li class="nav-item">

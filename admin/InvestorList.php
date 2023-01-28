@@ -65,7 +65,7 @@ $customer=DBHelper::get("SELECT * FROM `investor` where company_id = '{$_SESSION
         <div class="card-body">
 
         <form method="post">
-        <h4>Search Customer</h4>
+        <h4>Search Investor</h4>
         <div class="row mt-2">
             <div class="col">
             <input required name="query" type="text" class="form-control" placeholder="Search here...">
@@ -110,7 +110,9 @@ $customer=DBHelper::get("SELECT * FROM `investor` where company_id = '{$_SESSION
                         <td><?php echo $row["mobile"];?></td>
                         <td class=""><?php echo $row["address"];?></td>
                         <td>
-                            <a href="Investor_Profile.php?ID=<?php echo $row["id"];?>" class="btn btn-info btn-sm">View Details</a>
+                            <a href="Investor_Profile.php?ID=<?php echo $row["id"];?>" class="btn btn-info btn-sm">
+                              <i class="nav-icon fas fa-eye"></i>
+                          </a>
                         </td>
                     </tr>
                         <?php
