@@ -30,6 +30,39 @@ $company_id = $_REQUEST["company_id"];
 if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
 // to verify admin
 
+ // --------------------- Search Customer --------------------------
+   if(trim($type) == "searchAllCustomer"){
+     $srType = $_POST["srType"];  // 0 - name, 1 - mobile, 2 - cnic, 3 - id 
+     $query = $_POST["query"];  
+
+       if($srType == "3"){
+          $qry=" WHERE customer.id='$query'";
+        }
+        elseif($srType == "2"){
+          $qry=" WHERE customer.cnic='$query'";
+        }
+        elseif($srType == "1"){
+          $qry=" WHERE customer.mobile='$query'";
+        }
+        elseif($srType == "0"){
+          $qry=" WHERE customer.name LIKE '%".$query."%'";
+        }
+
+        $qry = "SELECT customer.*,company_info.name as cname FROM `customer` INNER JOIN company_info on company_id = company_info.id ".$qry;
+        $customer= DBHelper::get($qry);
+        $response = [];
+
+       if($customer->num_rows > 0){
+        while($row = $customer->fetch_assoc()){
+          array_push($response,$row);
+        }
+      }
+        echo json_encode($response);
+   }
+ // --------------------- Search Customer --------------------------
+
+
+
  // --------------------- Get admin profile start --------------------------
    if(trim($type) == "getAdminProfile"){
        $data = DBHelper::get("select * from admin where id = {$adminID}");
@@ -540,7 +573,8 @@ echo json_encode($response);
    $data=DBHelper::get("SELECT customer.id AS 'cusID',customer.name,customer.mobile,companies.name 
    as 'comp',item_type.name as 'item',application.* from application INNER JOIN 
    customer on customer.id = cusID INNER JOIN companies on companies.id = companyID 
-   INNER JOIN item_type on item_type.id = item_type_id where {$search} and application.company_id = $company_id;");
+   INNER JOIN item_type on item_type.id = item_type_id where $search;");
+
    while($row = $data->fetch_assoc()){
      array_push($response,$row);
    }
@@ -577,16 +611,16 @@ else{
  elseif(trim($type) == "getApplicationDetails_View"){
    $appID = validateInput($_POST["appID"]);
    $response = [];
-   $application = DBHelper::get("SELECT * FROM application WHERE id = {$appID} and company_id = $company_id")->fetch_assoc();
-   $customer = DBHelper::get("SELECT * FROM `customer` WHERE id = {$application['cusID']} and company_id = $company_id")->fetch_assoc();
+   $application = DBHelper::get("SELECT * FROM application WHERE id = {$appID}")->fetch_assoc();
+   $customer = DBHelper::get("SELECT * FROM `customer` WHERE id = {$application['cusID']}")->fetch_assoc();
    $response["customer"] = $customer;
 
    if($application["status"] == '3' || $application["status"] == '4'){
-    $investor = DBHelper::get("SELECT * FROM `investor` WHERE id = {$application['investorID']} and company_id = $company_id")->fetch_assoc();
+    $investor = DBHelper::get("SELECT * FROM `investor` WHERE id = {$application['investorID']} ")->fetch_assoc();
     $response["investor"] = $investor; 
 
     $trans = [];
-    $Trandata = DBHelper::get("SELECT * FROM `application_installment` WHERE appID = {$application["id"]} and company_id = $company_id");
+    $Trandata = DBHelper::get("SELECT * FROM `application_installment` WHERE appID = {$application["id"]}");
     while($row = $Trandata->fetch_assoc()){
       array_push($trans,$row);
     }
@@ -599,11 +633,11 @@ else{
 
   $installment = DBHelper::get("SELECT  (
     SELECT COUNT(id)
-    FROM   application_installment WHERE appID = {$application["id"]} and company_id = $company_id
+    FROM   application_installment WHERE appID = {$application["id"]} 
 ) AS count,
 (
     SELECT sum(amount)
-    FROM   application_installment WHERE appID = {$application["id"]} and company_id = $company_id
+    FROM   application_installment WHERE appID = {$application["id"]} 
 ) AS total")->fetch_assoc();
 
   $response["total_paid_amount"] = $installment["total"];
