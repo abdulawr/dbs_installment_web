@@ -22,7 +22,7 @@ if($balance < $data["amount"]){
 }
 
 if(DBHelper::set("DELETE FROM `application_installment` WHERE id = {$ID}")){
-    DBHelper::set("UPDATE `company_account` SET `amount`= amount - {$data["amount"]} where company_id = $company_id");
+    DBHelper::set("UPDATE `company_account` SET `amount`= amount - {$data["amount"]} where id = $company_id");
     ?>
     <script>
         alert("Successfully deleted");
