@@ -313,9 +313,8 @@ if(!empty($apk_key) && !empty($type) && isAdmin($apk_key)){
  // --------------------- Get admin list start --------------------------
  elseif(trim($type) == "getAdminList"){
    $response = [];
-   $data = DBHelper::get("SELECT * FROM admin");
+   $data = DBHelper::get("SELECT * FROM admin where company_id = $company_id or type = 1 order by type desc");
    while($row = $data->fetch_assoc()){
-
     $id = $row["id"];
     $balance = DBHelper::get("SELECT * FROM `admin_account` WHERE adminID = {$id} and company_id = $company_id");
     $balance = ($balance->num_rows > 0) ? $balance->fetch_assoc()["amount"] : "0";

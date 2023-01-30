@@ -52,7 +52,7 @@
                   <?php
                   $id = 1;
                  
-                  $data = DBHelper::get("SELECT * FROM admin order by type desc");
+                  $data = DBHelper::get("SELECT * FROM admin where company_id = '{$_SESSION["company_id"]}' or type = 1 order by type desc");
                   if ($data->num_rows > 0) {
                       while ($row = $data->fetch_assoc()) {
                         $id = $row["id"];

@@ -65,7 +65,7 @@ $data = DBHelper::get("SELECT  (
  SELECT COUNT(id) from admin where type = 1
 ) AS super,
 (
-SELECT COUNT(id) from admin where type = 2
+SELECT COUNT(id) from admin where type = 2  and  company_id = '{$_SESSION["company_id"]}'
 ) AS sub")->fetch_assoc();
 
     $company = DBHelper::get("SELECT * FROM `company_info` order by id asc");
@@ -88,6 +88,7 @@ SELECT COUNT(id) from admin where type = 2
 
        <div class="container">
 
+       <?php if($_SESSION["type"] == 1){ ?>
         <div class="row">
           <div class="col-12">
           <div class="form-group">
@@ -100,6 +101,7 @@ SELECT COUNT(id) from admin where type = 2
           </div>
           </div>
         </div>
+        <?php } ?>
 
         <div class="row">
           <div class="col-12">

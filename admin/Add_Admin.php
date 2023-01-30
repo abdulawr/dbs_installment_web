@@ -68,9 +68,24 @@
 
         <div class="form-group mt-3">
             <label for="exampleFormControlSelect1">Select Role</label>
-            <select name="type" class="form-control" id="exampleFormControlSelect1">
+            <select name="type" class="form-control" id="roleSelect">
             <option value="1">Super Admin</option>
             <option value="2">Sub Admin</option>
+            </select>
+        </div>
+
+        <?php
+              $company = DBHelper::get("SELECT * FROM `company_info` order by id asc");
+        ?>
+
+        <div class="form-group mt-3">
+            <label for="exampleFormControlSelect1">Select Company</label>
+            <select disabled name="company_id" class="form-control" id="compIDSelect">
+               <?php
+                  while($row = $company->fetch_assoc()){
+                    echo '<option value="'.$row["id"].'">'.$row["name"].'</option>';
+                  }
+               ?>
             </select>
         </div>
 
@@ -107,6 +122,18 @@
 </body>
 </html>
 
+<script>
+  $("#roleSelect").on("change",function(){
+    var sele = $('#roleSelect').find(":selected").val();
+     if(sele == 2){
+       $('#compIDSelect').removeAttr('disabled'); 
+     }
+     else{
+       $("#compIDSelect").attr('disabled', 'disabled');
+     }
+  });
+</script>
+
 <?php
 if(isset($_POST["submit"])){
 $name=validateInput($_POST["name"]);
@@ -117,6 +144,8 @@ $address=validateInput($_POST["address"]);
 $admin_type=validateInput($_POST["type"]);
 $pass=Encryption::Encrypt($_POST["pass"]);
 
+$company_id = ($admin_type == 2) ? $_POST["company_id"] : "1000";
+
 $type=$_FILES["file"]["type"];
 $type=explode("/",$type)[1];
 $arrType=["png","jpg","jpeg","gif"];
@@ -126,7 +155,7 @@ if($select->num_rows <= 0){
     if(in_array($type,$arrType)){
         $imageName="admin_".$mobile.RandomString(15).".".$type;
         if(move_uploaded_file($_FILES['file']['tmp_name'],"../images/admin/".$imageName)){
-         if(DBHelper::set("INSERT INTO `admin`(`name`, `mobile`, `email`, `pass`, `image`, `cnic`, `address`, `type`) VALUES ('{$name}','{$mobile}','{$email}','{$pass}','{$imageName}','{$cnic}','{$address}',$admin_type)")){
+         if(DBHelper::set("INSERT INTO `admin`(`name`, `mobile`, `email`, `pass`, `image`, `cnic`, `address`, `type`,company_id) VALUES ('{$name}','{$mobile}','{$email}','{$pass}','{$imageName}','{$cnic}','{$address}',$admin_type,$company_id)")){
             showMessage("Account created successfully!",true);    
          }   
          else{

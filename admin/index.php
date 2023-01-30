@@ -120,12 +120,18 @@ if(isset($_POST["submit"])){
 
     $qry=DBHelper::get("SELECT * FROM `admin` WHERE email='{$email}' and pass='{$pass}' and account_status = 0");
     if($qry->num_rows > 0){
+      $qry=$qry->fetch_assoc();
 
-      $company = DBHelper::get("SELECT * FROM `company_info` where id = 1000")->fetch_assoc();
+      if($qry["type"] == 1){
+          $company = DBHelper::get("SELECT * FROM `company_info` where id = 1000")->fetch_assoc();
+      }
+      else{
+          $company = DBHelper::get("SELECT * FROM `company_info` where id = '{$qry["company_id"]}'")->fetch_assoc();
+      }
+
       $_SESSION['company'] = $company;
       $_SESSION['company_id'] = $company['id'];
 
-      $qry=$qry->fetch_assoc();
       $_SESSION["isAdmin"]=$qry["id"];  
       $_SESSION["type"]=$qry["type"];  
       $_SESSION["user"]=$qry
@@ -153,6 +159,7 @@ if(isset($_POST["submit"])){
       $_SESSION["type"]='3';  
 
       $company = DBHelper::get("SELECT * FROM `company_info` where id = '{$qry["company_id"]}'")->fetch_assoc();
+    
       $_SESSION['company'] = $company;
       $_SESSION['company_id'] = $company['id'];
 
