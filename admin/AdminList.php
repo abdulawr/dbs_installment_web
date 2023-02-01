@@ -62,7 +62,7 @@
                         $access_pending_amount = DBHelper::get("SELECT SUM(amount) as total FROM `accessories_account` WHERE status = 0 and type = 1 and sellID = {$row["id"]}");
                         $amount = ($access_pending_amount->num_rows > 0) ? $access_pending_amount->fetch_assoc()["total"] : "0";
                               if($row["type"] == 1){
-                                DBHelper::set("UPDATE admin_transaction SET `paymentStatus` = 1 WHERE `adminID` = {$row["id"]}");
+                                DBHelper::set("UPDATE admin_transaction SET `paymentStatus` = 1 WHERE `adminID` = {$row["id"]} and company_id = '{$_SESSION['company_id']}");
                               }
                               ?>
                           <tr>

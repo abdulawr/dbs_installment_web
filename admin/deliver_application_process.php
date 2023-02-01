@@ -81,7 +81,7 @@ if(DBHelper::set($pending_payment_query)){
         DBHelper::set("UPDATE company_account set amount=amount + {$app["advance_payment"]} where id = '{$_SESSION['company_id']}' ");
       }
 
-      DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID) VALUES ({$app["advance_payment"]},'{$date}',2,'customer',$adminID,$appID)");
+      DBHelper::set("INSERT INTO `admin_transaction`(`amount`, `date`, `status`, `type`, `adminID`,appID,company_id) VALUES ({$app["advance_payment"]},'{$date}',2,'customer',$adminID,$appID,'{$_SESSION['company_id']}')");
 
       $state = true;
     }
