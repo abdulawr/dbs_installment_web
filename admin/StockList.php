@@ -6,7 +6,15 @@ $id=$_POST["id"];
 $qry="SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = {$id} and quantity > 0 and dbs_shop_stock.company_id = '{$_SESSION["company_id"]}'";
 $customer=DBHelper::get($qry);
 }
-
+elseif(isset($_GET["spID"])){
+  $id = validateInput($_GET["spID"]);
+  $customer=DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where dbs_shop_stock.id = '{$id}' and dbs_shop_stock.company_id = '{$_SESSION["company_id"]}'");
+  ?>
+   <script>
+      alert("Stock updated successfully");
+   </script>
+  <?php
+}
 else{
 $customer=DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_stock INNER JOIN mobile_company_dbs ON companyID = mobile_company_dbs.id where quantity > 0 and dbs_shop_stock.company_id = '{$_SESSION["company_id"]}'");
 }
@@ -73,7 +81,11 @@ $customer=DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_st
                     <th>Selling Price</th>
                     <th>Quantity</th>
                     <th>Fringerprint</th>
-                
+                    <?php
+                      if($_SESSION["type"] == "1"){
+                        echo " <th></th>";
+                      }
+                    ?>
                   </tr>
                   </thead>
                   <tbody>
@@ -96,7 +108,13 @@ $customer=DBHelper::get("SELECT dbs_shop_stock.*,name as 'comp' FROM dbs_shop_st
                         <td><?php echo $row["selling_price"];?></td>
                         <td><?php echo $row["quantity"];?></td>
                         <td><?php echo ($row["fringerprint"] == 0) ? "Yes":"No";?></td>
-                        
+                        <?php
+                      if($_SESSION["type"] == "1"){
+                         echo '<td>
+                          <a href="MobileCategory?id='.$row["id"].'" class="btn btn-warning btn-sm">Edit</a>
+                          </td>';
+                        }
+                       ?>
                        
                     </tr>
                         <?php
