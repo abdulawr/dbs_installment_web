@@ -48,7 +48,7 @@
 
                 <div class="form-group col">
                 <label for="inputEmail4">Company</label>
-                <select disabled name="company" id="inputState" class="form-control">
+                <select <?php echo isset($_GET["id"]) ? "disabled" : ""; ?>  name="company" id="inputState" class="form-control">
                     <?php
                     $company = DBHelper::get("SELECT * FROM `mobile_company_dbs` order by id asc");
                     if($company->num_rows > 0){
@@ -73,7 +73,7 @@
 
                 <div class="form-group col">
                 <label for="inputEmail4">RAM</label>
-                <select disabled name="ram" id="inputState" class="form-control">
+                <select <?php echo isset($_GET["id"]) ? "disabled" : ""; ?> name="ram" id="inputState" class="form-control">
                   <?php
                      foreach($rams as $row){
                         if(isset($_GET['id']) && $row == $data["ram"]){
@@ -89,7 +89,7 @@
 
                 <div class="form-group col">
                 <label for="inputPassword4">Memory</label>
-                <select disabled name="memory" id="inputState" class="form-control">
+                <select <?php echo isset($_GET["id"]) ? "disabled" : ""; ?> name="memory" id="inputState" class="form-control">
                   <?php
                      foreach($rams as $row){
                       if(isset($_GET['id']) && $row == $data["memory"]){
@@ -111,7 +111,7 @@
 
                 <div class="form-group col">
                 <label for="inputEmail4">SIM Type</label>
-                <select disabled name="sim" id="inputState" class="form-control">
+                <select <?php echo isset($_GET["id"]) ? "disabled" : ""; ?> name="sim" id="inputState" class="form-control">
                     <option <?php if(isset($_GET["id"]) && $data["sim"] == 'Single sim'){echo 'selected="selected"';}?> value="Single sim">Single sim</option>
                     <option <?php if(isset($_GET["id"]) && $data["sim"] == 'Double sim'){echo 'selected="selected"';}?> value="Double sim">Double sim</option>
                     <option <?php if(isset($_GET["id"]) && $data["sim"] == 'Triple sim'){echo 'selected="selected"';}?> value="Triple sim">Triple sim</option>
@@ -120,7 +120,7 @@
 
                 <div class="form-group col">
                 <label for="inputEmail4">Network</label>
-                <select disabled name="network" id="inputState" class="form-control">
+                <select <?php echo isset($_GET["id"]) ? "disabled" : ""; ?> name="network" id="inputState" class="form-control">
                     <option <?php if(isset($_GET["id"]) && $data["network"] == "2G"){echo 'selected="selected"';}?>>2G</option>
                     <option <?php if(isset($_GET["id"]) && $data["network"] == "3G"){echo 'selected="selected"';}?>>3G</option>
                     <option <?php if(isset($_GET["id"]) && $data["network"] == "4G"){echo 'selected="selected"';}?>>4G</option>
@@ -130,7 +130,7 @@
 
                 <div class="form-group col">
                 <label for="inputPassword4">Fringprint support</label>
-                <select disabled name="fringerprint" id="fingerprint" id="inputState" class="form-control">
+                <select <?php echo isset($_GET["id"]) ? "disabled" : ""; ?> name="fringerprint" id="fingerprint" id="inputState" class="form-control">
                     <option <?php if(isset($_GET["id"]) && $data["fringerprint"] == 0){echo 'selected="selected"';}?> value="0">Yes</option>
                     <option <?php if(isset($_GET["id"]) && $data["fringerprint"] == 1){echo 'selected="selected"';}?> value="1">No</option>
                 </select>
@@ -141,12 +141,12 @@
             <div class="form-row">
                <div class="form-group col">
                 <label for="inputAddress">Front camera</label>
-                <input disabled name="front_camera" required type="number" class="form-control" id="inputAddress" placeholder="Front camera" value="<?php if(isset($_GET["id"])){echo $data["font_camera"];}?>">
+                <input <?php echo isset($_GET["id"]) ? "disabled" : ""; ?> name="front_camera" required type="number" class="form-control" id="inputAddress" placeholder="Front camera" value="<?php if(isset($_GET["id"])){echo $data["font_camera"];}?>">
                 </div>
 
                 <div class="form-group col">
                 <label for="inputAddress">Back camera</label>
-                <input disabled name="back_camera" type="text" required class="form-control" id="inputAddress" placeholder="Back camera" value="<?php if(isset($_GET["id"])){echo $data["back_camera"];}?>">
+                <input <?php echo isset($_GET["id"]) ? "disabled" : ""; ?> name="back_camera" type="text" required class="form-control" id="inputAddress" placeholder="Back camera" value="<?php if(isset($_GET["id"])){echo $data["back_camera"];}?>">
                 </div>
             </div>
 
@@ -155,7 +155,7 @@
 
                 <div class="form-group col">
                 <label for="inputAddress">Buying price</label>
-                <input disabled type="number" required name="buying_price" class="form-control" id="inputAddress" placeholder="Buying price" value="<?php if(isset($_GET["id"])){echo $data["buy_price"];}?>">
+                <input <?php echo isset($_GET["id"]) ? "disabled" : ""; ?> type="number" required name="buying_price" class="form-control" id="inputAddress" placeholder="Buying price" value="<?php if(isset($_GET["id"])){echo $data["buy_price"];}?>">
                 </div>
 
                 <div class="form-group col">
