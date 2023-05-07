@@ -107,7 +107,7 @@ h3{
             if($barcodeText != '') {
                 echo '<img class="barcode" style="float:right" alt="'.$barcodeText.'" src="include/barcode.php?text='.$barcodeText.'&codetype='.$barcodeType.'&orientation='.$barcodeDisplay.'&size='.$barcodeSize.'&print='.$printText.'"/>';
             }
-            ?>
+          ?>
 
         <div class="sign container">
           <div class="row">
