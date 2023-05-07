@@ -27,6 +27,30 @@ h3{
   text-align: left !important;
   padding-left: 20px !important;
 }
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid #009879;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 9px 15px;
+}
+
+    #printTable{
+      display: none;
+      visibility: hidden;
+      width:100%;
+    }
+
     .bbbbsss:hover{
         cursor: pointer;
     }
@@ -49,14 +73,28 @@ h3{
         visibility: hidden;
       }
       .sign{
-  display: block;
-  visibility: visible;
-}
+        display: block;
+        visibility: visible;
+      }
+      #printTable{
+        display: table;
+        visibility: visible;
+        width:100% !important;
+        margin-bottom:30px;
+      }
+      #example2{
+        display: none;
+        visibility: hidden;
+      }
+      .pr_amount{
+        color:black !important;
+        font-size:20px !important;
+      }
     }
 </style>
   <?php
     $date = date('Y-m-d');
-    $q = "SELECT company_info.name as cmpn,admin.name,admin_transaction.* FROM `admin_transaction` INNER JOIN admin on adminID = admin.id INNER JOIN company_info on admin_transaction.company_id = company_info.id where admin_transaction.status in(2,0) ";
+    $q = "SELECT company_info.name as cmpn,admin.name,admin_transaction.* FROM `admin_transaction` INNER JOIN admin on adminID = admin.id INNER JOIN company_info on admin_transaction.company_id = company_info.id where admin_transaction.status in(2,0,1) ";
 
     if(isset($_POST["submit"])){
        $date = $_POST["searchDate"];
@@ -74,6 +112,11 @@ h3{
 
     $q .= " and admin_transaction.date = '$date' ";
     $payments = DBHelper::get($q);
+
+    $records = [];
+    while($row = $payments->fetch_assoc()){
+      array_push($records,$row);
+    }
   ?>
 
 <?php
@@ -169,6 +212,56 @@ h3{
         </div>
 
         <div class="print_container">
+        <table class="styled-table" id="printTable" style="width:100%">
+          <thead>
+          <tr>
+                <th>Seq no</th>
+                <th>Date</th>
+                <th>Company</th>
+                <th>Amount</th>
+                <th>Admin ID</th>
+                <th>Admin name</th>
+                <th>App ID</th>
+                <th>Status</th>
+                </tr>
+          </thead>
+          <tbody>
+                <?php 
+                 $rec = $payments;
+                 if(count($records) > 0){
+                    $i = 1;
+                    foreach($records as $row){
+                        ?>
+                         <tr>
+                            <td><?php echo $i; ?></td>
+                            <td><?php echo date("d-m-Y",strtotime($row["date"]));?></td>
+                            <td><?php echo $row["cmpn"];?></td>
+                            <td><?php echo $row["amount"];?></td>
+                            <td><?php echo $row["adminID"];?></td>
+                            <td><?php echo $row["name"];?></td>
+                            <td><?php echo $row["appID"]; ?></td>
+                            <td>
+                                <?php if($row["status"] == 2) { ?>
+                                 <span class="bg-success px-2 rounded cp-txt" style="font-size:14px; padding-bottom:2px;">Received installment</span>
+                                <?php } elseif($row["status"] == 0) { ?>
+                                    <span class="bg-warning px-2 rounded cp-txt" style="font-size:14px; padding-bottom:2px;">Add into investor account</span>
+                                <?php } elseif($row["status"] == 1) { ?>
+                                    <span class="bg-danger px-2 rounded cp-txt" style="font-size:14px; padding-bottom:2px;">Sub from investor account</span>
+                                <?php } ?>
+                            </td>
+                          </tr>
+                        <?php
+                        $i++;
+                    }
+                 }
+                ?>
+            </tbody>
+        </table>
+                </div>
+
+
+
+        <div class="print_container">
         <table id="example2" class="table table-bordered table-hover my-3">
             <thead>
                 <tr>
@@ -186,10 +279,17 @@ h3{
             <tbody>
                 <?php 
                  $total = 0;
-                 if($payments->num_rows > 0){
+                 $cash = 0;
+                 $spends = 0;
+                 if(count($records) > 0){
                     $i = 1;
-                    while($row = $payments->fetch_assoc()){
-                        $total += $row["amount"];
+                    foreach($records as $row){
+                        if($row["status"] == "1"){
+                          $spends += $row["amount"];
+                        }else{
+                          $cash += $row["amount"];
+                        }
+                          $total += $row["amount"];
                         ?>
                          <tr>
                             <td><?php echo $i; ?></td>
@@ -202,8 +302,10 @@ h3{
                             <td>
                                 <?php if($row["status"] == 2) { ?>
                                  <span class="bg-success px-2 rounded cp-txt" style="font-size:14px; padding-bottom:2px;">Received installment</span>
-                                <?php } else { ?>
+                                <?php } elseif($row["status"] == 0) { ?>
                                     <span class="bg-warning px-2 rounded cp-txt" style="font-size:14px; padding-bottom:2px;">Add into investor account</span>
+                                <?php } elseif($row["status"] == 1) { ?>
+                                    <span class="bg-danger px-2 rounded cp-txt" style="font-size:14px; padding-bottom:2px;">Sub from investor account</span>
                                 <?php } ?>
                             </td>
                           </tr>
@@ -216,7 +318,9 @@ h3{
 
           </table>
 
-          <h4 class="bg-warning rounded px-3 text-right text-bold">Amount: <?php echo $total; ?></h4>
+          <h4 class="pr_amount bg-danger rounded px-3 text-right text-bold">Spends: <?php echo $spends; ?></h4>
+          <h4 class="pr_amount bg-success rounded px-3 text-right text-bold">Cash: <?php echo $cash; ?></h4>
+          <h4 class="pr_amount bg-warning rounded px-3 text-right text-bold">Total amount: <?php echo $total; ?></h4>
           </div>
         
         </div>
