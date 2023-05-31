@@ -12,17 +12,15 @@ if(isset($_SESSION["company_id"])){
   $ID = $_POST["ID"];
 
   $balance = $_POST["balance"];
-  $balance = abs($balance);
-  
-  if($type == 1){
-     $balance = $balance - $amount;
-  }
-  elseif($type == 2 && $amount > $balance){
-    $balance = $amount - $balance;
-  }
-  elseif($type == 2 && $amount <= $balance){
-    $balance = $balance + $amount;
-  }
+  $balance = $balance;
+
+if($type == 1){
+    $balance = $balance - $amount;
+}
+elseif($type == 2){
+  $balance = $balance + $amount;
+}
+
 
   $qr = "SELECT * FROM `dg_user_account` WHERE `user_id` = '$ID'";
   $user_account = DBHelper::get($qr);

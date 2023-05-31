@@ -20,7 +20,7 @@
         $balance =  $user_account->fetch_assoc()["balance"];
      }
     $user = DBHelper::get("select * from dg_user where id = '$id'")->fetch_assoc();
-    $transactions = DBHelper::get("SELECT * FROM `dg_user_transaction` WHERE `user_id` = '$id' order by id desc");
+    $transactions = DBHelper::get("SELECT * FROM `dg_user_transaction` WHERE `user_id` = '$id' order by id asc");
   ?>
 
 
