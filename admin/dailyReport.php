@@ -318,9 +318,9 @@ h3{
 
           </table>
 
+          <h4 class="pr_amount bg-warning rounded px-3 text-right text-bold">Total amount: <?php echo $total; ?></h4>
           <h4 class="pr_amount bg-danger rounded px-3 text-right text-bold">Spends: <?php echo $spends; ?></h4>
           <h4 class="pr_amount bg-success rounded px-3 text-right text-bold">Cash: <?php echo $cash; ?></h4>
-          <h4 class="pr_amount bg-warning rounded px-3 text-right text-bold">Total amount: <?php echo $total; ?></h4>
           </div>
         
         </div>
