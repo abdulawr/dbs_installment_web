@@ -287,9 +287,9 @@ h3{
                         if($row["status"] == "1"){
                           $spends += $row["amount"];
                         }else{
-                          $cash += $row["amount"];
+                           $total += $row["amount"];
                         }
-                          $total += $row["amount"];
+                         
                         ?>
                          <tr>
                             <td><?php echo $i; ?></td>
@@ -318,6 +318,9 @@ h3{
 
           </table>
 
+<?php
+  $cash = $total - $spends;
+?>
           <h4 class="pr_amount bg-warning rounded px-3 text-right text-bold">Total amount: <?php echo $total; ?></h4>
           <h4 class="pr_amount bg-danger rounded px-3 text-right text-bold">Spends: <?php echo $spends; ?></h4>
           <h4 class="pr_amount bg-success rounded px-3 text-right text-bold">Cash: <?php echo $cash; ?></h4>
