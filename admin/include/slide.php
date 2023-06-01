@@ -275,6 +275,13 @@
                 </a>
               </li>
 
+                <li class="nav-item">
+                <a href="DigiKhataReport" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p> DigiKhata Report</p>
+                </a>
+              </li>
+
             </ul>
           </li>
           <?php } ?>
